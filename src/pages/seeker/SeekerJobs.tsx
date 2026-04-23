@@ -1,8 +1,27 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { User } from "../../App";
-import { motion, AnimatePresence } from "motion/react";
-import { Search, Filter, ArrowRight, Briefcase, MapPin, DollarSign, Star, Zap, Loader2, Sparkles, X, FileText, ScrollText, Bookmark, Building, MessageSquareWarning } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import {
+  ArrowRight,
+  Bookmark,
+  Briefcase,
+  DollarSign,
+  FileText,
+  Filter,
+  Loader2,
+  MapPin,
+  MessageSquareWarning,
+  RefreshCcw,
+  Search,
+  Sparkles,
+  Star,
+  X,
+  Zap,
+  Building,
+  ScrollText,
+} from "lucide-react";
 import { aiService } from "../../services/aiService";
+import { useSearchParams } from "react-router-dom";
 
 export default function SeekerJobs({ user }: { user: User }) {
   const [jobs, setJobs] = useState<any[]>([]);
@@ -12,6 +31,7 @@ export default function SeekerJobs({ user }: { user: User }) {
   const [matchResult, setMatchResult] = useState<any>(null);
   const [showCoverLetter, setShowCoverLetter] = useState(false);
   const [coverLetterText, setCoverLetterText] = useState("");
+  const [coverLetterInstructions, setCoverLetterInstructions] = useState("");
   const [generatingLetter, setGeneratingLetter] = useState(false);
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
@@ -24,439 +44,691 @@ export default function SeekerJobs({ user }: { user: User }) {
   const [showFilters, setShowFilters] = useState(false);
   const [feedbackText, setFeedbackText] = useState("");
   const [submittingFeedback, setSubmittingFeedback] = useState(false);
+  const [submittingApplication, setSubmittingApplication] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
     fetchProfile();
     fetchSavedJobs();
-  }, []);
+  }, [user?.id]);
 
   useEffect(() => {
     fetchJobs();
   }, [category]);
 
-  const fetchSavedJobs = async () => {
+  useEffect(() => {
+    const jobIdFromUrl = searchParams.get("id");
+    if (!jobIdFromUrl || jobs.length === 0 || selectedJob) return;
+
+    const job = jobs.find((item) => item.id === jobIdFromUrl);
+    if (!job) return;
+
+    void openJob(job);
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.delete("id");
+    setSearchParams(nextParams, { replace: true });
+  }, [jobs, searchParams, selectedJob, setSearchParams]);
+
+  const fetchProfile = async () => {
     try {
-      const res = await fetch(`/api/saved-jobs/${user?.id}`);
-      const data = await res.json();
-      setSavedJobs(data.map((sj: any) => sj.jobId));
-    } catch (err) { console.error(err); }
+      const response = await fetch(`/api/profile/${user?.id}`);
+      const data = await response.json();
+      setProfile(data);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const handleToggleSave = async (jobId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const fetchSavedJobs = async () => {
     try {
-      const res = await fetch("/api/saved-jobs", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user?.id, jobId })
-      });
-      const data = await res.json();
-      if (data.saved) {
-        setSavedJobs(prev => [...prev, jobId]);
-      } else {
-        setSavedJobs(prev => prev.filter(id => id !== jobId));
-      }
-    } catch (err) { console.error(err); }
+      const response = await fetch(`/api/saved-jobs/${user?.id}`);
+      const data = await response.json();
+      setSavedJobs(data.map((savedJob: any) => savedJob.jobId));
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const fetchJobs = async () => {
     setLoading(true);
     try {
-      const q = new URLSearchParams();
-      if (query) q.append("query", query);
-      if (category && category !== "All Roles") q.append("category", category);
-      if (requirements) q.append("requirements", requirements);
-      if (experienceLevel) q.append("experienceLevel", experienceLevel);
-      if (workMode) q.append("workMode", workMode);
-      if (companySize) q.append("companySize", companySize);
+      const params = new URLSearchParams();
+      if (query) params.append("query", query);
+      if (category && category !== "All Roles") params.append("category", category);
+      if (requirements) params.append("requirements", requirements);
+      if (experienceLevel) params.append("experienceLevel", experienceLevel);
+      if (workMode) params.append("workMode", workMode);
+      if (companySize) params.append("companySize", companySize);
 
-      const res = await fetch(`/api/jobs?${q.toString()}`);
-      const data = await res.json();
-      setJobs(data);
-    } catch (err) {
-      console.error(err);
+      const response = await fetch(`/api/jobs?${params.toString()}`);
+      const data = await response.json();
+      setJobs(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error(error);
     } finally {
       setLoading(false);
     }
   };
 
-  const submitFeedback = async (jobId: string) => {
-    if (!feedbackText.trim()) return;
-    setSubmittingFeedback(true);
+  const handleToggleSave = async (jobId: string, event: React.MouseEvent) => {
+    event.stopPropagation();
     try {
-      await fetch(`/api/jobs/${jobId}/feedback`, {
+      const response = await fetch("/api/saved-jobs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user?.id, rating: 3, comment: feedbackText, issueType: "REPORT" })
+        body: JSON.stringify({ userId: user?.id, jobId }),
       });
-      alert("Feedback submitted. Thank you!");
-      setFeedbackText("");
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setSubmittingFeedback(false);
+      const data = await response.json();
+
+      if (data.saved) {
+        setSavedJobs((currentSavedJobs) => [...currentSavedJobs, jobId]);
+      } else {
+        setSavedJobs((currentSavedJobs) => currentSavedJobs.filter((id) => id !== jobId));
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
-  const fetchProfile = async () => {
+  const trackJobView = async (jobId: string) => {
     try {
-      const res = await fetch(`/api/profile/${user?.id}`);
-      const data = await res.json();
-      setProfile(data);
-    } catch (err) { console.error(err); }
+      const response = await fetch(`/api/jobs/${jobId}/view`, { method: "POST" });
+      const data = await response.json();
+
+      setJobs((currentJobs) =>
+        currentJobs.map((job) => (job.id === jobId ? { ...job, viewCount: data.viewCount } : job)),
+      );
+      setSelectedJob((currentSelectedJob: any) =>
+        currentSelectedJob?.id === jobId ? { ...currentSelectedJob, viewCount: data.viewCount } : currentSelectedJob,
+      );
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const handleMatch = async (job: any) => {
-    if (!profile) return;
+  const openJob = async (job: any, resetMatch = true) => {
     setSelectedJob(job);
-    setMatching(true);
-    setMatchResult(null);
+    setFeedbackText("");
+    setCoverLetterInstructions("");
     setShowCoverLetter(false);
     setCoverLetterText("");
+
+    if (resetMatch) {
+      setMatchResult(null);
+    }
+
+    await trackJobView(job.id);
+  };
+
+  const handleMatch = async (job: any, force = false) => {
+    if (!profile || !user?.id) {
+      alert("Please complete your profile before running AI match.");
+      return;
+    }
+
+    await openJob(job, !force);
+    setMatching(true);
+    if (!force) {
+      setMatchResult(null);
+    }
+
     try {
-      const result = await aiService.matchJob(profile, job.description);
+      const result = await aiService.matchJob(user.id, job.id, force);
       setMatchResult(result);
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error(error);
+      alert("We couldn't generate the AI match right now.");
     } finally {
       setMatching(false);
     }
   };
 
+  const handleGenerateCoverLetter = async () => {
+    if (!selectedJob || !user?.id) return;
+
+    setGeneratingLetter(true);
+    try {
+      const result = await aiService.generateCoverLetter(
+        user.id,
+        selectedJob.id,
+        coverLetterInstructions,
+      );
+      setCoverLetterText(result.coverLetter);
+      setShowCoverLetter(true);
+    } catch (error) {
+      console.error(error);
+      alert("We couldn't generate the cover letter right now.");
+    } finally {
+      setGeneratingLetter(false);
+    }
+  };
+
   const handleApply = async () => {
     if (!selectedJob || !user) return;
+
+    setSubmittingApplication(true);
     try {
-        const res = await fetch("/api/applications", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId: user.id, jobId: selectedJob.id })
-        });
-        if (res.ok) {
-            alert("Application submitted successfully!");
-            setSelectedJob(null);
-        }
-    } catch (err) { console.error(err); }
+      const response = await fetch("/api/applications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: user.id,
+          jobId: selectedJob.id,
+          coverLetter: coverLetterText || undefined,
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.error || "Unable to submit application");
+      }
+
+      alert("Application submitted successfully!");
+      setSelectedJob(null);
+      setMatchResult(null);
+      setShowCoverLetter(false);
+      setCoverLetterText("");
+      setCoverLetterInstructions("");
+    } catch (error: any) {
+      console.error(error);
+      alert(error.message || "Unable to submit application");
+    } finally {
+      setSubmittingApplication(false);
+    }
+  };
+
+  const submitFeedback = async (jobId: string) => {
+    if (!feedbackText.trim()) return;
+
+    setSubmittingFeedback(true);
+    try {
+      await fetch(`/api/jobs/${jobId}/feedback`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: user?.id,
+          rating: 3,
+          comment: feedbackText,
+          issueType: "REPORT",
+        }),
+      });
+      alert("Feedback submitted. Thank you!");
+      setFeedbackText("");
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setSubmittingFeedback(false);
+    }
   };
 
   return (
     <div className="space-y-8 pb-20">
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <header className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
         <div>
-            <h1 className="text-4xl font-bold tracking-tight mb-2">Opportunities</h1>
-            <p className="text-[#141414]/60">Discover roles tailored to your unique professional profile.</p>
+          <div className="eyebrow mb-2">Job Discovery</div>
+          <h1 className="mb-2 text-4xl font-semibold tracking-[-0.04em]">Opportunities</h1>
+          <p className="text-[var(--app-text-muted)]">
+            Discover roles tailored to your profile and refine each application with AI.
+          </p>
         </div>
-        <div className="flex gap-2 bg-white p-2 rounded-2xl border border-[#141414]/5 shadow-sm min-w-[320px]">
-            <div className="flex-1 flex items-center gap-2 pl-2">
-                <Search size={18} className="text-[#141414]/40" />
-                <input 
-                    type="text" 
-                    placeholder="Search roles or companies" 
-                    className="w-full bg-transparent border-none outline-none text-sm py-2"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && fetchJobs()}
-                />
-            </div>
-            <button 
-                onClick={() => setShowFilters(!showFilters)}
-                className={`p-2 rounded-xl transition-colors ${showFilters ? 'bg-[#F27D26] text-white' : 'text-[#141414]/40 hover:bg-[#F5F5F0]'}`}
-            >
-                <Filter size={18} />
-            </button>
-            <button 
-                onClick={fetchJobs}
-                className="bg-[#141414] text-[#F5F5F0] px-4 py-2 rounded-xl text-xs font-bold hover:opacity-90 transition-opacity"
-            >
-                Search
-            </button>
+        <div className="panel-surface flex min-w-[320px] gap-2 rounded-2xl p-2">
+          <div className="flex flex-1 items-center gap-2 pl-2">
+            <Search size={18} className="text-[var(--app-text-soft)]" />
+            <input
+              type="text"
+              placeholder="Search roles or companies"
+              className="w-full border-none bg-transparent py-2 text-sm outline-none"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              onKeyDown={(event) => event.key === "Enter" && fetchJobs()}
+            />
+          </div>
+          <button
+            onClick={() => setShowFilters((current) => !current)}
+            className={`rounded-xl p-2 transition-colors ${
+              showFilters ? "button-primary text-white" : "text-[var(--app-text-soft)] hover:bg-white"
+            }`}
+          >
+            <Filter size={18} />
+          </button>
+          <button
+            onClick={fetchJobs}
+            className="button-primary rounded-xl px-4 py-2 text-xs font-semibold transition-all"
+          >
+            Search
+          </button>
         </div>
       </header>
 
       <AnimatePresence>
         {showFilters && (
-            <motion.div 
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="bg-white p-6 rounded-[2rem] border border-[#141414]/5 overflow-hidden"
-            >
-                <div className="space-y-4">
-                   <div>
-                       <label className="block text-xs uppercase font-bold tracking-widest text-[#141414]/40 mb-2 ml-1">Required Skills / Qualifications</label>
-                       <input
-                           type="text"
-                           placeholder="e.g. React, TypeScript, 5+ years experience"
-                           className="w-full px-4 py-3 bg-[#F5F5F0] rounded-xl outline-none text-sm focus:ring-2 focus:ring-[#F27D26]/50 transition-all font-medium"
-                           value={requirements}
-                           onChange={(e) => setRequirements(e.target.value)}
-                           onKeyDown={(e) => e.key === 'Enter' && fetchJobs()}
-                       />
-                   </div>
-                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                       <div>
-                           <label className="block text-xs uppercase font-bold tracking-widest text-[#141414]/40 mb-2 ml-1">Experience Level</label>
-                           <select 
-                               value={experienceLevel} 
-                               onChange={(e) => setExperienceLevel(e.target.value)}
-                               className="w-full px-4 py-3 bg-[#F5F5F0] rounded-xl outline-none text-sm focus:ring-2 focus:ring-[#F27D26]/50 transition-all font-medium appearance-none"
-                           >
-                               <option value="">Any Level</option>
-                               <option value="Entry Level">Entry Level</option>
-                               <option value="Mid Level">Mid Level</option>
-                               <option value="Senior">Senior</option>
-                               <option value="Director">Director</option>
-                           </select>
-                       </div>
-                       <div>
-                           <label className="block text-xs uppercase font-bold tracking-widest text-[#141414]/40 mb-2 ml-1">Work Mode</label>
-                           <select 
-                               value={workMode} 
-                               onChange={(e) => setWorkMode(e.target.value)}
-                               className="w-full px-4 py-3 bg-[#F5F5F0] rounded-xl outline-none text-sm focus:ring-2 focus:ring-[#F27D26]/50 transition-all font-medium appearance-none"
-                           >
-                               <option value="">Any Mode</option>
-                               <option value="Remote">Remote</option>
-                               <option value="Hybrid">Hybrid</option>
-                               <option value="Onsite">Onsite</option>
-                           </select>
-                       </div>
-                       <div>
-                           <label className="block text-xs uppercase font-bold tracking-widest text-[#141414]/40 mb-2 ml-1">Company Size</label>
-                           <select 
-                               value={companySize} 
-                               onChange={(e) => setCompanySize(e.target.value)}
-                               className="w-full px-4 py-3 bg-[#F5F5F0] rounded-xl outline-none text-sm focus:ring-2 focus:ring-[#F27D26]/50 transition-all font-medium appearance-none"
-                           >
-                               <option value="">Any Size</option>
-                               <option value="Startup">Startup (1-50)</option>
-                               <option value="Mid-size">Mid-size (51-500)</option>
-                               <option value="Enterprise">Enterprise (500+)</option>
-                           </select>
-                       </div>
-                   </div>
-                </div>
-            </motion.div>
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="panel-surface overflow-hidden rounded-[2rem] p-6"
+          >
+            <div className="space-y-4">
+              <div>
+                <label className="ml-1 mb-2 block text-xs font-bold uppercase tracking-widest text-[#141414]/40">
+                  Required Skills / Qualifications
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. React, TypeScript, 5+ years experience"
+                  className="field-shell w-full rounded-xl px-4 py-3 text-sm font-medium transition-all"
+                  value={requirements}
+                  onChange={(event) => setRequirements(event.target.value)}
+                  onKeyDown={(event) => event.key === "Enter" && fetchJobs()}
+                />
+              </div>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <SelectField
+                  label="Experience Level"
+                  value={experienceLevel}
+                  onChange={setExperienceLevel}
+                  options={[
+                    { value: "", label: "Any Level" },
+                    { value: "ENTRY", label: "Entry" },
+                    { value: "MID_LEVEL", label: "Mid-Level" },
+                    { value: "SENIOR", label: "Senior" },
+                    { value: "DIRECTOR", label: "Director" },
+                  ]}
+                />
+                <SelectField
+                  label="Work Mode"
+                  value={workMode}
+                  onChange={setWorkMode}
+                  options={[
+                    { value: "", label: "Any Mode" },
+                    { value: "REMOTE", label: "Remote" },
+                    { value: "HYBRID", label: "Hybrid" },
+                    { value: "ONSITE", label: "Onsite" },
+                  ]}
+                />
+                <SelectField
+                  label="Company Size"
+                  value={companySize}
+                  onChange={setCompanySize}
+                  options={[
+                    { value: "", label: "Any Size" },
+                    { value: "STARTUP", label: "Startup" },
+                    { value: "MID_SIZE", label: "Mid-size" },
+                    { value: "ENTERPRISE", label: "Enterprise" },
+                  ]}
+                />
+              </div>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Categories */}
-      <div className="flex gap-2 overflow-x-auto pb-2 -mx-2 px-2 scrollbar-none">
-        {["All Roles", "Engineering", "Design", "Marketing", "Management", "Sales"].map(cat => (
-            <button 
-                key={cat} 
-                onClick={() => setCategory(cat)}
-                className={`px-5 py-2 whitespace-nowrap border rounded-xl text-xs font-bold transition-all ${category === cat ? 'bg-[#141414] text-[#F5F5F0] border-[#141414]' : 'bg-white border-[#141414]/5 hover:bg-[#141414] hover:text-[#F5F5F0]'}`}
-            >
-                {cat}
-            </button>
+      <div className="scrollbar-none -mx-2 flex gap-2 overflow-x-auto px-2 pb-2">
+        {["All Roles", "Engineering", "Design", "Marketing", "Management", "Sales"].map((item) => (
+          <button
+            key={item}
+            onClick={() => setCategory(item)}
+            className={`whitespace-nowrap rounded-xl border px-5 py-2 text-xs font-bold transition-all ${
+              category === item
+                ? "nav-link-luxury-active"
+                : "panel-surface text-[var(--app-text-muted)] hover:text-[var(--app-text)]"
+            }`}
+          >
+            {item}
+          </button>
         ))}
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid gap-6 lg:grid-cols-2">
         {loading ? (
-            [1,2,3,4].map(i => <div key={i} className="h-40 bg-white rounded-3xl animate-pulse"></div>)
+          [1, 2, 3, 4].map((item) => <div key={item} className="panel-surface h-40 animate-pulse rounded-3xl" />)
         ) : jobs.length > 0 ? (
-            jobs.map((job: any) => (
-                <div 
-                    key={job.id} 
-                    className="bg-white p-8 rounded-[2rem] border border-[#141414]/5 hover:shadow-xl hover:shadow-[#141414]/5 transition-all group flex flex-col justify-between"
-                >
-                    <div>
-                        <div className="flex justify-between items-start mb-6">
-                            <div className="w-14 h-14 bg-[#F5F5F0] rounded-2xl flex items-center justify-center font-bold text-2xl text-[#141414]/20">
-                                {job.company[0]}
-                            </div>
-                            <div className="flex gap-2 items-center">
-                                <span className="px-3 py-1 bg-green-50 text-green-700 text-[10px] uppercase font-bold tracking-widest rounded-full">{job.type || 'Full Time'}</span>
-                                <button onClick={(e) => handleToggleSave(job.id, e)} className="text-[#141414]/40 hover:text-[#F27D26] transition-colors p-1">
-                                    <Bookmark size={20} className={savedJobs.includes(job.id) ? "fill-[#F27D26] text-[#F27D26]" : ""} />
-                                </button>
-                            </div>
-                        </div>
-                        <h3 className="text-xl font-bold mb-2 group-hover:text-[#F27D26] transition-colors">{job.title}</h3>
-                        <div className="flex items-center gap-4 text-sm text-[#141414]/40 mb-6 font-medium">
-                            {job.recruiterId ? (
-                               <a href={`/company/${job.recruiterId}`} className="flex items-center gap-1.5 hover:text-[#F27D26] transition-colors"><Building size={14} /> {job.company}</a>
-                            ) : (
-                               <div className="flex items-center gap-1.5"><Briefcase size={14} /> {job.company}</div>
-                            )}
-                            <div className="flex items-center gap-1.5"><MapPin size={14} /> {job.location || 'Remote'}</div>
-                            {job.experienceLevel && <div className="flex items-center gap-1.5"><Star size={14} /> {job.experienceLevel}</div>}
-                        </div>
-                        <p className="text-sm text-[#141414]/60 line-clamp-2 mb-8 leading-relaxed">{job.description}</p>
-                    </div>
-                    
-                    <div className="flex items-center justify-between pt-6 border-t border-[#141414]/5">
-                        <div className="flex items-center gap-1.5 text-sm font-bold">
-                            <DollarSign size={14} className="text-green-600" /> {job.salary || '$80k - $120k'}
-                        </div>
-                        <button 
-                            onClick={() => handleMatch(job)}
-                            className="flex items-center gap-2 text-sm font-bold bg-[#F5F5F0] text-[#141414] px-5 py-2.5 rounded-xl hover:bg-[#141414] hover:text-[#F5F5F0] transition-all"
-                        >
-                            AI Match <Zap size={14} className="text-[#F27D26]" />
-                        </button>
-                    </div>
+          jobs.map((job) => (
+            <div
+              key={job.id}
+              className="panel-surface group flex flex-col justify-between rounded-[2rem] p-8 transition-all hover:-translate-y-0.5"
+            >
+              <div>
+                <div className="mb-6 flex items-start justify-between">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[rgba(93,107,255,0.08)] text-2xl font-semibold text-[var(--app-text-soft)]">
+                    {job.company[0]}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-full bg-green-50 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-green-700">
+                      {(job.type || "FULL_TIME").replaceAll("_", " ")}
+                    </span>
+                    <button
+                      onClick={(event) => handleToggleSave(job.id, event)}
+                      className="p-1 text-[#141414]/40 transition-colors hover:text-[#F27D26]"
+                    >
+                      <Bookmark
+                        size={20}
+                        className={savedJobs.includes(job.id) ? "fill-[#F27D26] text-[#F27D26]" : ""}
+                      />
+                    </button>
+                  </div>
                 </div>
-            ))
-        ) : (
-            <div className="lg:col-span-2 py-20 bg-white rounded-[2rem] border border-[#141414]/5 text-center">
-                <Search size={48} className="mx-auto text-[#141414]/10 mb-4" />
-                <h3 className="text-xl font-bold mb-2">No jobs found</h3>
-                <p className="text-[#141414]/40">Try adjusting your search filters or check back later.</p>
+                <h3 className="mb-2 text-xl font-semibold transition-colors group-hover:text-[var(--app-accent)]">
+                  {job.title}
+                </h3>
+                <div className="mb-6 flex flex-wrap items-center gap-4 text-sm font-medium text-[var(--app-text-muted)]">
+                  {job.recruiterId ? (
+                    <a
+                      href={`/company/${job.recruiterId}`}
+                      className="flex items-center gap-1.5 transition-colors hover:text-[#F27D26]"
+                    >
+                      <Building size={14} /> {job.company}
+                    </a>
+                  ) : (
+                    <div className="flex items-center gap-1.5">
+                      <Briefcase size={14} /> {job.company}
+                    </div>
+                  )}
+                  <div className="flex items-center gap-1.5">
+                    <MapPin size={14} /> {job.location || "Remote"}
+                  </div>
+                  {job.experienceLevel && (
+                    <div className="flex items-center gap-1.5">
+                      <Star size={14} /> {formatLabel(job.experienceLevel)}
+                    </div>
+                  )}
+                </div>
+                <p className="mb-8 line-clamp-2 text-sm leading-relaxed text-[var(--app-text-muted)]">
+                  {job.description}
+                </p>
+              </div>
+
+              <div className="flex items-center justify-between border-t border-[rgba(41,49,81,0.08)] pt-6">
+                <div className="flex items-center gap-1.5 text-sm font-bold">
+                  <DollarSign size={14} className="text-green-600" />
+                  {job.salary || "$80k - $120k"}
+                </div>
+                <button
+                  onClick={() => handleMatch(job)}
+                  className="button-secondary flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all"
+                >
+                  AI Match <Zap size={14} className="text-[#F27D26]" />
+                </button>
+              </div>
             </div>
+          ))
+        ) : (
+          <div className="panel-surface lg:col-span-2 rounded-[2rem] py-20 text-center">
+            <Search size={48} className="mx-auto mb-4 text-[var(--app-text-soft)]" />
+            <h3 className="mb-2 text-xl font-bold">No jobs found</h3>
+            <p className="text-[var(--app-text-soft)]">Try adjusting your filters or check back later.</p>
+          </div>
         )}
       </div>
 
-      {/* Match Modal */}
       <AnimatePresence>
         {selectedJob && (
-            <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[60] flex items-center justify-center p-6"
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] flex items-center justify-center p-6"
+          >
+            <div
+              className="absolute inset-0 bg-[#141414]/40 backdrop-blur-sm"
+              onClick={() => setSelectedJob(null)}
+            />
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="panel-surface-strong relative z-10 flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-[3rem]"
             >
-                <div className="absolute inset-0 bg-[#141414]/40 backdrop-blur-sm" onClick={() => setSelectedJob(null)}></div>
-                <motion.div 
-                    initial={{ scale: 0.9, y: 20 }}
-                    animate={{ scale: 1, y: 0 }}
-                    exit={{ scale: 0.9, y: 20 }}
-                    className="w-full max-w-2xl bg-[#F5F5F0] rounded-[3rem] overflow-hidden shadow-2xl relative z-10 flex flex-col max-h-[90vh]"
+              <div className="gradient-surface flex items-center justify-between p-10">
+                <div>
+                  <div className="eyebrow mb-2 text-[var(--app-accent)]">
+                    Job Interaction
+                  </div>
+                  <h2 className="text-3xl font-semibold tracking-tight">{selectedJob.title}</h2>
+                  <p className="mt-1 text-sm text-[var(--app-text-muted)]">{selectedJob.company}</p>
+                </div>
+                <button
+                  onClick={() => setSelectedJob(null)}
+                  className="rounded-full p-2 transition-colors hover:bg-white/70"
                 >
-                    <div className="bg-[#141414] text-[#F5F5F0] p-10 flex justify-between items-center">
+                  <X size={24} />
+                </button>
+              </div>
+
+              <div className="space-y-8 overflow-y-auto p-10">
+                <div>
+                  <h3 className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#141414]/40">
+                    Job Description
+                  </h3>
+                  <p className="text-sm leading-relaxed opacity-70">{selectedJob.description}</p>
+                </div>
+
+                {matching ? (
+                  <div className="panel-surface rounded-[2rem] py-12 text-center">
+                    <Loader2 size={32} className="mx-auto mb-4 animate-spin text-[#F27D26]" />
+                    <h4 className="font-bold">AI is calculating your fit...</h4>
+                    <p className="mt-1 text-xs text-[#141414]/40">
+                      Comparing your profile against the job requirements
+                    </p>
+                  </div>
+                ) : matchResult ? (
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+                    <div className="panel-surface rounded-[2rem] p-8">
+                      <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
                         <div>
-                            <div className="text-[10px] uppercase font-bold tracking-[0.2em] opacity-40 mb-2">Job Interaction</div>
-                            <h2 className="text-3xl font-bold tracking-tight">{selectedJob.title}</h2>
-                            <p className="text-[#F5F5F0]/60 text-sm mt-1">{selectedJob.company}</p>
+                          <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[#141414]/40">
+                            AI Match
+                          </div>
+                          <div className="text-6xl font-black leading-none text-[#F27D26]">
+                            {matchResult.score}%
+                          </div>
                         </div>
-                        <button onClick={() => setSelectedJob(null)} className="p-2 hover:bg-white/10 rounded-full transition-colors">
-                            <X size={24} />
+                        <button
+                          onClick={() => handleMatch(selectedJob, true)}
+                          className="button-secondary inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold uppercase tracking-widest transition-all"
+                        >
+                          <RefreshCcw size={14} /> Regenerate
                         </button>
+                      </div>
+                      <div className="mt-4 max-w-xl text-xs italic leading-relaxed opacity-60">
+                        "{matchResult.reasoning}"
+                      </div>
                     </div>
 
-                    <div className="p-10 overflow-y-auto space-y-8">
-                        <div>
-                            <h3 className="text-xs uppercase font-bold tracking-[0.2em] text-[#141414]/40 mb-4">Job Description</h3>
-                            <p className="text-sm leading-relaxed opacity-70">{selectedJob.description}</p>
+                    {matchResult.missingKeywords?.length > 0 && (
+                      <div className="rounded-2xl border border-orange-100 bg-orange-50/50 p-6">
+                        <h4 className="mb-3 text-[10px] font-bold uppercase tracking-widest text-orange-700">
+                          Optimization Tips (Add to resume)
+                        </h4>
+                        <div className="flex flex-wrap gap-2">
+                          {matchResult.missingKeywords.map((keyword: string) => (
+                            <span
+                              key={keyword}
+                              className="rounded-lg border border-orange-200 bg-white px-3 py-1 text-[10px] font-bold uppercase text-orange-700"
+                            >
+                              {keyword}
+                            </span>
+                          ))}
                         </div>
+                      </div>
+                    )}
 
-                        {matching ? (
-                            <div className="py-12 bg-white rounded-[2rem] border border-[#141414]/5 text-center">
-                                <Loader2 size={32} className="animate-spin mx-auto text-[#F27D26] mb-4" />
-                                <h4 className="font-bold">AI is calculating your fit...</h4>
-                                <p className="text-xs text-[#141414]/40 mt-1">Comparing technical skills and cultural alignment</p>
-                            </div>
-                        ) : matchResult ? (
-                            <motion.div 
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                className="space-y-6"
-                            >
-                                <div className="bg-white p-8 rounded-[2rem] border border-[#141414]/5 flex items-center justify-between">
-                                    <div>
-                                        <div className="text-[10px] uppercase font-bold tracking-widest text-[#141414]/40 mb-2">Computed Fit</div>
-                                        <div className="text-6xl font-black text-[#F27D26] leading-none">{matchResult.score}%</div>
-                                    </div>
-                                    <div className="max-w-xs text-xs leading-relaxed opacity-60 italic">
-                                        "{matchResult.reasoning}"
-                                    </div>
-                                </div>
+                    <div>
+                      <h3 className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#141414]/40">
+                        Fit Analysis
+                      </h3>
+                      <div className="panel-surface rounded-2xl p-6 text-sm leading-relaxed opacity-80">
+                        {matchResult.fitAnalysis}
+                      </div>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <button
+                    onClick={() => handleMatch(selectedJob)}
+                    className="button-primary flex w-full items-center justify-center gap-3 rounded-2xl py-6 font-semibold transition-all"
+                  >
+                    Calculate AI Match Score <Sparkles size={20} />
+                  </button>
+                )}
+              </div>
 
-                                {matchResult.missingKeywords?.length > 0 && (
-                                    <div className="bg-orange-50/50 p-6 rounded-2xl border border-orange-100">
-                                        <h4 className="text-[10px] uppercase font-bold tracking-widest text-orange-700 mb-3">Optimization Tips (Add to resume)</h4>
-                                        <div className="flex flex-wrap gap-2">
-                                            {matchResult.missingKeywords.map((tag: any, i: number) => (
-                                                <span key={i} className="px-3 py-1 bg-white border border-orange-200 text-orange-700 text-[10px] font-bold rounded-lg uppercase">{tag}</span>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
+              <div className="p-10 pt-0">
+                <div className="panel-surface mb-6 rounded-2xl p-6">
+                  <label className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-[#141414]/40">
+                    <FileText size={16} /> Cover Letter Instructions
+                  </label>
+                  <textarea
+                    className="field-shell h-28 w-full resize-none rounded-2xl p-4 text-sm transition-colors"
+                    placeholder="Add keywords, tone, achievements, or special instructions for the AI cover letter."
+                    value={coverLetterInstructions}
+                    onChange={(event) => setCoverLetterInstructions(event.target.value)}
+                  />
+                </div>
 
-                                <div>
-                                    <h3 className="text-xs uppercase font-bold tracking-[0.2em] text-[#141414]/40 mb-4">Fit Analysis</h3>
-                                    <div className="p-6 bg-white rounded-2xl border border-[#141414]/5 text-sm leading-relaxed opacity-80">
-                                        {matchResult.fitAnalysis}
-                                    </div>
-                                </div>
-                            </motion.div>
+                {showCoverLetter ? (
+                  <div className="space-y-4">
+                    <div className="flex flex-col gap-3 sm:flex-row">
+                      <button
+                        onClick={handleGenerateCoverLetter}
+                        disabled={generatingLetter}
+                        className="button-secondary flex-1 rounded-2xl py-4 text-sm font-semibold transition-all disabled:opacity-50"
+                      >
+                        {generatingLetter ? (
+                          <span className="inline-flex items-center gap-2">
+                            <Loader2 size={16} className="animate-spin" /> Regenerating...
+                          </span>
                         ) : (
-                            <button 
-                                onClick={() => handleMatch(selectedJob)}
-                                className="w-full py-6 bg-[#F27D26] text-[#141414] rounded-2xl font-bold flex items-center justify-center gap-3 hover:opacity-90 transition-opacity"
-                            >
-                                Calculate AI Match Score <Sparkles size={20} />
-                            </button>
+                          <span className="inline-flex items-center gap-2">
+                            <RefreshCcw size={16} className="text-[#F27D26]" /> Regenerate with Instructions
+                          </span>
                         )}
+                      </button>
+                    </div>
+                    <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-[#141414]/40">
+                      <ScrollText size={16} /> Cover Letter (Review & Edit)
+                    </h3>
+                    <textarea
+                      className="field-shell h-48 w-full resize-none rounded-2xl p-4 text-sm transition-colors"
+                      value={coverLetterText}
+                      onChange={(event) => setCoverLetterText(event.target.value)}
+                    />
+                    <button
+                      onClick={handleApply}
+                      disabled={submittingApplication}
+                      className="button-primary flex w-full items-center justify-center gap-2 rounded-2xl py-5 text-lg font-semibold transition-all disabled:opacity-50"
+                    >
+                      {submittingApplication ? (
+                        <Loader2 size={20} className="animate-spin" />
+                      ) : (
+                        <>
+                          Submit Application <ArrowRight size={20} />
+                        </>
+                      )}
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="mb-8 flex flex-col gap-4 sm:flex-row">
+                      <button
+                        onClick={handleGenerateCoverLetter}
+                        disabled={generatingLetter}
+                        className="button-secondary flex flex-1 items-center justify-center gap-2 rounded-2xl py-5 text-lg font-semibold transition-all disabled:opacity-50"
+                      >
+                        {generatingLetter ? (
+                          <Loader2 className="animate-spin text-[#F27D26]" size={20} />
+                        ) : (
+                          <>
+                            <FileText size={20} className="text-[#F27D26]" /> Generate AI Cover Letter
+                          </>
+                        )}
+                      </button>
+                      <button
+                        onClick={handleApply}
+                        disabled={submittingApplication}
+                        className="button-primary flex flex-1 items-center justify-center gap-2 rounded-2xl py-5 text-lg font-semibold transition-all disabled:opacity-50"
+                      >
+                        {submittingApplication ? (
+                          <Loader2 size={20} className="animate-spin" />
+                        ) : (
+                          <>
+                            Quick Apply <ArrowRight size={20} />
+                          </>
+                        )}
+                      </button>
                     </div>
 
-                    <div className="p-10 pt-0">
-                        {showCoverLetter ? (
-                            <div className="space-y-4">
-                                <h3 className="text-xs uppercase font-bold tracking-[0.2em] text-[#141414]/40 flex items-center gap-2"><ScrollText size={16} /> Cover Letter (Review & Edit)</h3>
-                                <textarea 
-                                    className="w-full h-48 p-4 bg-white rounded-2xl border border-[#141414]/10 text-sm resize-none outline-none focus:border-[#F27D26] transition-colors"
-                                    value={coverLetterText}
-                                    onChange={(e) => setCoverLetterText(e.target.value)}
-                                ></textarea>
-                                <button 
-                                   onClick={handleApply}
-                                   className="w-full py-5 bg-[#141414] text-[#F5F5F0] rounded-2xl font-bold text-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
-                                >
-                                    Submit Application <ArrowRight size={20} />
-                                </button>
-                            </div>
-                        ) : (
-                            <>
-                                <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                                    <button 
-                                       onClick={async () => {
-                                           setGeneratingLetter(true);
-                                           const res = await aiService.generateCoverLetter(profile, selectedJob);
-                                           setCoverLetterText(res.coverLetter);
-                                           setShowCoverLetter(true);
-                                           setGeneratingLetter(false);
-                                       }}
-                                       disabled={generatingLetter}
-                                       className="flex-1 py-5 bg-[#F5F5F0] text-[#141414] border border-[#141414]/10 rounded-2xl font-bold text-lg hover:bg-white transition-all flex items-center justify-center gap-2 hover:border-[#F27D26]"
-                                    >
-                                        {generatingLetter ? <Loader2 className="animate-spin text-[#F27D26]" size={20} /> : <><FileText size={20} className="text-[#F27D26]" /> AI Cover Letter</>}
-                                    </button>
-                                    <button 
-                                       onClick={handleApply}
-                                       className="flex-1 py-5 bg-[#141414] text-[#F5F5F0] rounded-2xl font-bold text-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
-                                    >
-                                        Quick Apply <ArrowRight size={20} />
-                                    </button>
-                                </div>
-                                
-                                <div className="p-6 bg-white border border-[#141414]/5 rounded-2xl">
-                                    <h4 className="text-xs uppercase font-bold tracking-[0.2em] text-[#141414]/40 mb-4 flex items-center gap-2"><MessageSquareWarning size={16} /> Job Feedback</h4>
-                                    <div className="flex gap-2">
-                                      <input 
-                                        type="text" 
-                                        value={feedbackText}
-                                        onChange={(e) => setFeedbackText(e.target.value)}
-                                        placeholder="Report issue or share feedback on this listing..."
-                                        className="flex-1 bg-[#F5F5F0] px-4 py-2 text-sm rounded-xl outline-none"
-                                      />
-                                      <button 
-                                        onClick={() => submitFeedback(selectedJob.id)}
-                                        disabled={submittingFeedback}
-                                        className="bg-[#141414] text-white px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap"
-                                      >
-                                        {submittingFeedback ? <Loader2 className="animate-spin" size={14} /> : "Submit"}
-                                      </button>
-                                    </div>
-                                </div>
-                            </>
-                        )}
+                    <div className="panel-surface rounded-2xl p-6">
+                      <h4 className="mb-4 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-[#141414]/40">
+                        <MessageSquareWarning size={16} /> Job Feedback
+                      </h4>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={feedbackText}
+                          onChange={(event) => setFeedbackText(event.target.value)}
+                          placeholder="Report an issue or share feedback on this listing..."
+                          className="field-shell flex-1 rounded-xl px-4 py-2 text-sm"
+                        />
+                        <button
+                          onClick={() => submitFeedback(selectedJob.id)}
+                          disabled={submittingFeedback}
+                          className="button-primary whitespace-nowrap rounded-xl px-4 py-2 text-xs font-semibold"
+                        >
+                          {submittingFeedback ? (
+                            <Loader2 className="animate-spin" size={14} />
+                          ) : (
+                            "Submit"
+                          )}
+                        </button>
+                      </div>
                     </div>
-                </motion.div>
+                  </>
+                )}
+              </div>
             </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>
   );
+}
+
+function SelectField({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  options: { value: string; label: string }[];
+}) {
+  return (
+    <div>
+      <label className="ml-1 mb-2 block text-xs font-bold uppercase tracking-widest text-[#141414]/40">
+        {label}
+      </label>
+      <select
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="field-shell w-full appearance-none rounded-xl px-4 py-3 text-sm font-medium transition-all"
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+function formatLabel(value: string) {
+  return value
+    .split("_")
+    .filter(Boolean)
+    .map((segment) => segment[0] + segment.slice(1).toLowerCase())
+    .join(" ");
 }

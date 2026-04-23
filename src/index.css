@@ -6,6 +6,32 @@
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
+:root {
+  --app-bg: #f7f7f8;
+  --app-bg-soft: #f2f4f8;
+  --app-surface: rgba(255, 255, 255, 0.82);
+  --app-surface-strong: rgba(255, 255, 255, 0.94);
+  --app-surface-muted: rgba(246, 248, 252, 0.92);
+  --app-border: rgba(41, 49, 81, 0.09);
+  --app-border-strong: rgba(41, 49, 81, 0.14);
+  --app-text: #20253a;
+  --app-text-muted: #687089;
+  --app-text-soft: #8d94ab;
+  --app-accent: #5d6bff;
+  --app-accent-strong: #4f5bf2;
+  --app-accent-soft: #eef0ff;
+  --app-secondary: #a38cf7;
+  --app-success: #4da982;
+  --app-shadow: 0 18px 60px rgba(124, 134, 173, 0.16);
+  --app-shadow-soft: 0 10px 30px rgba(119, 128, 163, 0.12);
+  --app-gradient-hero:
+    radial-gradient(circle at top left, rgba(163, 140, 247, 0.18), transparent 34%),
+    radial-gradient(circle at 85% 20%, rgba(93, 107, 255, 0.14), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(246, 248, 252, 0.95));
+  --app-gradient-panel:
+    linear-gradient(135deg, rgba(93, 107, 255, 0.1), rgba(163, 140, 247, 0.08));
+}
+
 @layer utilities {
   .mono {
     font-family: var(--font-mono);
@@ -18,10 +44,144 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  .app-shell {
+    background:
+      radial-gradient(circle at top left, rgba(163, 140, 247, 0.11), transparent 24%),
+      radial-gradient(circle at 90% 0%, rgba(93, 107, 255, 0.11), transparent 25%),
+      linear-gradient(180deg, #fcfcfd 0%, var(--app-bg) 45%, #f3f5f9 100%);
+  }
+
+  .app-sidebar {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(248, 249, 252, 0.88));
+    border-right: 1px solid var(--app-border);
+    backdrop-filter: blur(18px);
+  }
+
+  .app-workspace {
+    background:
+      radial-gradient(circle at top right, rgba(93, 107, 255, 0.08), transparent 28%),
+      linear-gradient(180deg, rgba(250, 251, 253, 0.92), rgba(243, 245, 249, 0.98));
+  }
+
+  .panel-surface {
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    box-shadow: var(--app-shadow-soft);
+    backdrop-filter: blur(18px);
+  }
+
+  .panel-surface-strong {
+    background: var(--app-surface-strong);
+    border: 1px solid var(--app-border);
+    box-shadow: var(--app-shadow);
+    backdrop-filter: blur(24px);
+  }
+
+  .panel-muted {
+    background: var(--app-surface-muted);
+    border: 1px solid rgba(93, 107, 255, 0.08);
+  }
+
+  .gradient-surface {
+    background: var(--app-gradient-hero);
+    border: 1px solid rgba(93, 107, 255, 0.1);
+    box-shadow: var(--app-shadow);
+  }
+
+  .accent-surface {
+    background: var(--app-gradient-panel);
+    border: 1px solid rgba(93, 107, 255, 0.12);
+  }
+
+  .button-primary {
+    background: linear-gradient(135deg, var(--app-accent), var(--app-secondary));
+    color: white;
+    box-shadow: 0 12px 28px rgba(93, 107, 255, 0.24);
+  }
+
+  .button-primary:hover {
+    filter: brightness(1.03);
+    transform: translateY(-1px);
+  }
+
+  .button-secondary {
+    background: rgba(255, 255, 255, 0.84);
+    border: 1px solid var(--app-border);
+    color: var(--app-text);
+  }
+
+  .button-secondary:hover {
+    background: rgba(255, 255, 255, 0.98);
+    border-color: rgba(93, 107, 255, 0.18);
+  }
+
+  .nav-link-luxury {
+    color: var(--app-text-muted);
+    border: 1px solid transparent;
+    background: transparent;
+  }
+
+  .nav-link-luxury:hover {
+    color: var(--app-text);
+    background: rgba(255, 255, 255, 0.7);
+    border-color: rgba(93, 107, 255, 0.08);
+  }
+
+  .nav-link-luxury-active {
+    color: var(--app-text);
+    background: linear-gradient(135deg, rgba(93, 107, 255, 0.14), rgba(163, 140, 247, 0.12));
+    border: 1px solid rgba(93, 107, 255, 0.16);
+    box-shadow: 0 10px 30px rgba(93, 107, 255, 0.12);
+  }
+
+  .eyebrow {
+    color: var(--app-text-soft);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+
+  .text-muted {
+    color: var(--app-text-muted);
+  }
+
+  .text-soft {
+    color: var(--app-text-soft);
+  }
+
+  .brand-mark {
+    background: linear-gradient(135deg, rgba(93, 107, 255, 0.92), rgba(163, 140, 247, 0.86));
+    box-shadow: 0 14px 30px rgba(93, 107, 255, 0.2);
+  }
+
+  .field-shell {
+    background: rgba(244, 246, 251, 0.88);
+    border: 1px solid transparent;
+  }
+
+  .field-shell:focus,
+  .field-shell:focus-visible {
+    outline: none;
+    border-color: rgba(93, 107, 255, 0.25);
+    box-shadow: 0 0 0 4px rgba(93, 107, 255, 0.09);
+  }
+
+  .metric-pill {
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
 }
 
 body {
-  @apply bg-[#F5F5F0] text-[#141414] antialiased;
+  background:
+    radial-gradient(circle at top left, rgba(163, 140, 247, 0.1), transparent 22%),
+    radial-gradient(circle at 82% 6%, rgba(93, 107, 255, 0.1), transparent 24%),
+    linear-gradient(180deg, #fcfcfd 0%, var(--app-bg) 48%, #f2f4f8 100%);
+  color: var(--app-text);
+  @apply antialiased;
 }
 
 /* Visually celebrate grid structure in dashboards */
@@ -30,4 +190,3 @@ body {
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
 }
-

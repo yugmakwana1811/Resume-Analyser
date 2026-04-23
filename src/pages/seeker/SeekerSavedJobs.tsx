@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { User } from "../../App";
 import { Briefcase, MapPin, DollarSign, BookmarkMinus, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function SeekerSavedJobs({ user }: { user: User }) {
   const [savedJobs, setSavedJobs] = useState<any[]>([]);
@@ -14,6 +15,10 @@ export default function SeekerSavedJobs({ user }: { user: User }) {
     setLoading(true);
     try {
       const res = await fetch(`/api/saved-jobs/${user?.id}`);
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({}));
+        throw new Error(error.error || "Unable to load saved jobs.");
+      }
       const data = await res.json();
       setSavedJobs(data);
     } catch (err) {
@@ -30,9 +35,11 @@ export default function SeekerSavedJobs({ user }: { user: User }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: user?.id, jobId })
       });
-      if (res.ok) {
-        setSavedJobs(prev => prev.filter(sj => sj.id !== savedJobId));
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({}));
+        throw new Error(error.error || "Unable to update saved jobs.");
       }
+      setSavedJobs(prev => prev.filter(sj => sj.id !== savedJobId));
     } catch (err) { console.error(err); }
   };
 
@@ -75,12 +82,12 @@ export default function SeekerSavedJobs({ user }: { user: User }) {
                         <div className="flex items-center gap-1.5 text-sm font-bold">
                             <DollarSign size={14} className="text-green-600" /> {job.salary || '$80k - $120k'}
                         </div>
-                        <a 
-                            href={`/dashboard/jobs?id=${job.id}`}
+                        <Link 
+                            to={`/dashboard/jobs?id=${job.id}`}
                             className="flex items-center gap-2 text-sm font-bold bg-[#141414] text-[#F5F5F0] px-5 py-2.5 rounded-xl hover:opacity-90 transition-opacity"
                         >
                             View Job <ArrowRight size={14} />
-                        </a>
+                        </Link>
                     </div>
                 </div>
             ))

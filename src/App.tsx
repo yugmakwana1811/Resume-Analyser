@@ -12,6 +12,7 @@ import RecruiterDashboard from "./pages/RecruiterDashboard";
 import PublicProfile from "./pages/PublicProfile";
 import CompanyProfile from "./pages/CompanyProfile";
 import Navbar from "./components/Navbar";
+import { safeJsonParse } from "./lib/utils";
 
 export type User = {
   id: string;
@@ -26,11 +27,30 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem("user");
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-    setLoading(false);
+    const syncAuth = async () => {
+      const savedUser = safeJsonParse<User>(localStorage.getItem("user"), null);
+      if (savedUser) {
+        setUser(savedUser);
+      }
+
+      try {
+        const response = await fetch("/api/auth/me");
+        if (!response.ok) {
+          throw new Error("Session not found");
+        }
+
+        const currentUser = await response.json();
+        setUser(currentUser);
+        localStorage.setItem("user", JSON.stringify(currentUser));
+      } catch {
+        setUser(null);
+        localStorage.removeItem("user");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    syncAuth();
   }, []);
 
   const login = (userData: User) => {
@@ -38,7 +58,12 @@ export default function App() {
     localStorage.setItem("user", JSON.stringify(userData));
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch (error) {
+      console.error(error);
+    }
     setUser(null);
     localStorage.removeItem("user");
   };
@@ -70,4 +95,3 @@ export default function App() {
     </Router>
   );
 }
-

@@ -22,13 +22,13 @@ export default function RecruiterDashboard({ user }: RecruiterDashboardProps) {
   if (!user) return null;
 
   return (
-    <div className="flex h-[calc(100vh-68px)]">
+    <div className="app-shell flex h-[calc(100vh-76px)]">
       {/* Sidebar */}
-      <aside className="w-64 border-r border-[#141414]/10 bg-white flex flex-col">
+      <aside className="app-sidebar hidden w-72 flex-col lg:flex">
         <div className="p-6">
-          <div className="bg-blue-50 rounded-xl p-4 mb-8">
-            <div className="text-xs uppercase tracking-widest font-bold text-blue-400 mb-1">Recruiter Account</div>
-            <div className="text-sm font-bold truncate text-blue-900">{user.email}</div>
+          <div className="accent-surface mb-8 rounded-[1.6rem] p-5">
+            <div className="eyebrow mb-2 text-[var(--app-accent)]">Recruiter Account</div>
+            <div className="truncate text-sm font-semibold text-[var(--app-text)]">{user.email}</div>
           </div>
 
           <nav className="space-y-1">
@@ -53,10 +53,10 @@ export default function RecruiterDashboard({ user }: RecruiterDashboardProps) {
           </nav>
         </div>
 
-        <div className="mt-auto p-6 border-t border-[#141414]/5 space-y-4">
+        <div className="mt-auto space-y-4 border-t border-[rgba(41,49,81,0.08)] p-6">
             <Link 
                 to="/dashboard/jobs" 
-                className="w-full flex items-center justify-center gap-2 py-3 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20"
+                className="button-primary flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold transition-all"
             >
                 <Plus size={18} /> Post a Job
             </Link>
@@ -64,8 +64,8 @@ export default function RecruiterDashboard({ user }: RecruiterDashboardProps) {
       </aside>
 
       {/* Content Area */}
-      <main className="flex-1 overflow-y-auto bg-[#F5F5F0]/30 p-8">
-        <div className="max-w-5xl mx-auto">
+      <main className="app-workspace flex-1 overflow-y-auto p-5 md:p-8">
+        <div className="mx-auto max-w-6xl">
           <Routes>
             <Route path="/" element={<RecruiterOverview user={user} />} />
             <Route path="/overview" element={<RecruiterOverview user={user} />} />
@@ -82,10 +82,10 @@ function SidebarLink({ to, icon, label, active }: { to: string, icon: React.Reac
   return (
     <Link 
       to={to} 
-      className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+      className={`flex items-center gap-3 rounded-[1rem] px-4 py-3 text-sm font-semibold transition-all ${
         active 
-          ? "bg-[#141414] text-[#F5F5F0] shadow-lg shadow-[#141414]/10" 
-          : "text-[#141414]/60 hover:bg-[#141414]/5 hover:text-[#141414]"
+          ? "nav-link-luxury-active"
+          : "nav-link-luxury"
       }`}
     >
       {icon}

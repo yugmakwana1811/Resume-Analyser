@@ -69,6 +69,7 @@ model Job {
   experienceLevel String? // ENTRY, MID_LEVEL, SENIOR, DIRECTOR
   workMode        String? // REMOTE, HYBRID, ONSITE
   companySize     String? // STARTUP, MID_SIZE, ENTERPRISE
+  viewCount       Int           @default(0)
   recruiterId     String?
   recruiter       Recruiter?    @relation(fields: [recruiterId], references: [id])
   applications    Application[]
@@ -88,6 +89,8 @@ model Match {
   score     Int
   reasoning String?
   createdAt DateTime @default(now())
+
+  @@unique([userId, jobId])
 }
 
 model Application {
@@ -99,6 +102,19 @@ model Application {
   status      String   @default("PENDING") // PENDING, SHORTLISTED, REJECTED
   coverLetter String?
   appliedAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  statusHistory ApplicationStatusHistory[]
+
+  @@unique([userId, jobId])
+}
+
+model ApplicationStatusHistory {
+  id            String      @id @default(cuid())
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  status        String
+  note          String?
+  changedAt     DateTime    @default(now())
 }
 
 model Recruiter {

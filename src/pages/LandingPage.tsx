@@ -1,249 +1,306 @@
 import { motion } from "motion/react";
 import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle, Rocket, Shield, Target, Users, Zap } from "lucide-react";
+import {
+  ArrowRight,
+  BriefcaseBusiness,
+  CheckCircle2,
+  Compass,
+  ShieldCheck,
+  Sparkles,
+  TrendingUp,
+  Zap,
+} from "lucide-react";
+
+const featureRows = [
+  {
+    title: "AI-guided resume refinement",
+    description: "Extracts signal from real resume content, surfaces skill gaps, and turns vague profiles into credible applications.",
+    icon: <Sparkles size={18} />,
+  },
+  {
+    title: "Match scoring with context",
+    description: "Every recommendation blends profile depth, role fit, and job description signals instead of simple keyword matching.",
+    icon: <Compass size={18} />,
+  },
+  {
+    title: "Hiring analytics recruiters trust",
+    description: "Views, applicants, recent pipeline activity, and status history stay visible without cluttering the workspace.",
+    icon: <TrendingUp size={18} />,
+  },
+];
 
 export default function LandingPage() {
   return (
-    <div className="flex flex-col">
-      {/* Hero Section */}
-      <section className="relative h-[90vh] flex items-center px-6 overflow-hidden bg-[#141414] text-[#F5F5F0]">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center z-10">
+    <div className="app-shell flex flex-col">
+      <section className="px-6 pb-18 pt-10 md:pb-24">
+        <div className="gradient-surface mx-auto grid max-w-7xl overflow-hidden rounded-[2.75rem] border px-6 py-8 md:px-10 md:py-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-12">
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55 }}
+            className="flex flex-col justify-between"
           >
-            <h1 className="text-7xl lg:text-9xl font-sans font-bold leading-[0.85] tracking-tighter mb-8 uppercase">
-              The smartest <br />
-              <span className="text-[#F27D26]">way to get hired</span>
-            </h1>
-            <p className="text-xl lg:text-2xl text-[#F5F5F0]/70 max-w-lg mb-12">
-              ApplyIQ uses advanced AI to analyze resumes, match you with perfect jobs, and generate winning career roadmaps.
-            </p>
-            <div className="flex flex-wrap gap-4">
+            <div>
+              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/80 bg-white/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-[var(--app-text-soft)] shadow-sm">
+                <Zap size={14} className="text-[var(--app-accent)]" />
+                Luxury Light Theme Redesign
+              </div>
+              <h1 className="max-w-3xl text-5xl font-semibold tracking-[-0.06em] text-[var(--app-text)] md:text-7xl lg:text-[5.6rem] lg:leading-[0.94]">
+                Career intelligence with a clearer, calmer point of view.
+              </h1>
+              <p className="mt-6 max-w-2xl text-lg leading-8 text-[var(--app-text-muted)] md:text-xl">
+                ApplyIQ helps candidates present sharper applications and gives recruiters a brighter, more trustworthy workspace for evaluating fit.
+              </p>
+            </div>
+
+            <div className="mt-10 flex flex-wrap items-center gap-4">
               <Link
                 to="/auth"
-                className="px-8 py-4 bg-[#F27D26] text-[#141414] rounded-full text-lg font-bold flex items-center gap-2 hover:scale-105 transition-transform"
+                className="button-primary inline-flex items-center gap-2 rounded-full px-7 py-4 text-sm font-semibold transition-all"
               >
-                Start for free <ArrowRight size={20} />
+                Start with ApplyIQ <ArrowRight size={18} />
               </Link>
-              <button className="px-8 py-4 border border-[#F5F5F0]/30 rounded-full text-lg font-bold hover:bg-[#F5F5F0]/10 transition-colors">
-                How it works
-              </button>
+              <a
+                href="#system"
+                className="button-secondary inline-flex items-center gap-2 rounded-full px-7 py-4 text-sm font-semibold transition-all"
+              >
+                Explore the system
+              </a>
+            </div>
+
+            <div className="mt-12 grid gap-4 sm:grid-cols-3">
+              <MetricCard value="84%" label="Average match confidence" />
+              <MetricCard value="2.3x" label="Faster shortlist review" />
+              <MetricCard value="10k+" label="Profiles analyzed" />
             </div>
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative hidden lg:block"
+            transition={{ duration: 0.7, delay: 0.12 }}
+            className="mt-10 lg:mt-0"
           >
-            <div className="w-full aspect-square bg-[#F27D26]/10 rounded-3xl border border-[#F27D26]/20 flex items-center justify-center relative overflow-hidden">
-               {/* Abstract decorative elements */}
-               <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-[#F27D26] rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-pulse"></div>
-               <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-blue-500 rounded-full mix-blend-screen filter blur-3xl opacity-10 animate-pulse delay-700"></div>
-               
-               <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl shadow-2xl relative z-10 max-w-md">
-                 <div className="flex items-center gap-4 mb-6">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-[#F27D26] to-orange-300"></div>
-                    <div>
-                        <div className="w-24 h-3 bg-white/20 rounded-full mb-2"></div>
-                        <div className="w-16 h-2 bg-white/10 rounded-full"></div>
+            <div className="panel-surface-strong relative overflow-hidden rounded-[2.4rem] p-5 md:p-6">
+              <div className="absolute left-0 top-0 h-40 w-40 rounded-full bg-[rgba(163,140,247,0.18)] blur-3xl" />
+              <div className="absolute bottom-0 right-0 h-44 w-44 rounded-full bg-[rgba(93,107,255,0.16)] blur-3xl" />
+
+              <div className="relative z-10 space-y-4">
+                <div className="flex items-center justify-between rounded-[1.5rem] border border-white/80 bg-white/78 p-4 shadow-sm">
+                  <div>
+                    <div className="eyebrow">Selected Opportunity</div>
+                    <div className="mt-2 text-xl font-semibold tracking-tight">Senior Product Engineer</div>
+                    <div className="mt-1 text-sm text-[var(--app-text-muted)]">Lattice Studio • Remote</div>
+                  </div>
+                  <div className="rounded-[1.25rem] bg-[rgba(93,107,255,0.1)] px-4 py-3 text-right">
+                    <div className="text-2xl font-semibold text-[var(--app-accent)]">94%</div>
+                    <div className="text-[11px] uppercase tracking-[0.22em] text-[var(--app-text-soft)]">AI Match</div>
+                  </div>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-[1fr_0.86fr]">
+                  <div className="panel-muted rounded-[1.8rem] p-5">
+                    <div className="mb-4 flex items-center justify-between">
+                      <div>
+                        <div className="eyebrow">Cover Letter Refinement</div>
+                        <div className="mt-2 text-lg font-semibold">Instruction-aware drafting</div>
+                      </div>
+                      <div className="rounded-full bg-white/70 px-3 py-1 text-xs font-semibold text-[var(--app-accent)]">
+                        Guided
+                      </div>
                     </div>
-                 </div>
-                 <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                        <span className="text-xs uppercase tracking-widest opacity-60">Match Score</span>
-                        <span className="text-2xl font-bold text-[#F27D26]">98%</span>
+
+                    <div className="space-y-3">
+                      <div className="rounded-2xl bg-white/80 p-4 text-sm leading-7 text-[var(--app-text-muted)] shadow-sm">
+                        “Highlight API design ownership, platform reliability, and my collaboration with data teams.”
+                      </div>
+                      <div className="rounded-2xl border border-dashed border-[rgba(93,107,255,0.18)] bg-[rgba(255,255,255,0.62)] p-4 text-sm leading-7 text-[var(--app-text)]">
+                        The generated draft now reflects product thinking, technical depth, and the candidate’s requested emphasis.
+                      </div>
                     </div>
-                    <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
-                        <motion.div 
-                          initial={{ width: 0 }}
-                          animate={{ width: "98%" }}
-                          transition={{ duration: 1.5, delay: 1 }}
-                          className="h-full bg-[#F27D26]"
-                        />
+                  </div>
+
+                  <div className="panel-muted rounded-[1.8rem] p-5">
+                    <div className="eyebrow">Pipeline Snapshot</div>
+                    <div className="mt-2 text-lg font-semibold">Status history stays visible</div>
+                    <div className="mt-5 space-y-3">
+                      {[
+                        ["Applied", "Today · 09:20"],
+                        ["Viewed by recruiter", "Today · 11:15"],
+                        ["Shortlisted", "Today · 12:40"],
+                      ].map(([label, meta]) => (
+                        <div key={label} className="flex gap-3">
+                          <div className="mt-1 h-2.5 w-2.5 rounded-full bg-[var(--app-accent)]" />
+                          <div>
+                            <div className="text-sm font-semibold text-[var(--app-text)]">{label}</div>
+                            <div className="text-xs text-[var(--app-text-soft)]">{meta}</div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    <div className="grid grid-cols-2 gap-2 mt-4">
-                        {[1,2,3,4].map(i => (
-                            <div key={i} className="h-2 bg-white/5 rounded-full"></div>
-                        ))}
-                    </div>
-                 </div>
-               </div>
+                  </div>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-3">
+                  <MiniPanel title="Resume health" value="92" suffix="/100" />
+                  <MiniPanel title="Views this week" value="128" />
+                  <MiniPanel title="Qualified applicants" value="17" />
+                </div>
+              </div>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-24 px-6 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-sm uppercase tracking-widest text-[#141414]/40 font-bold mb-4">Powerful Features</h2>
-            <h3 className="text-4xl lg:text-6xl font-bold tracking-tight">Everything you need to level up</h3>
+      <section id="system" className="px-6 py-6 md:py-10">
+        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.7fr_1.3fr]">
+          <div className="space-y-4">
+            <div className="eyebrow">System-first product design</div>
+            <h2 className="text-4xl font-semibold tracking-[-0.04em] text-[var(--app-text)] md:text-5xl">
+              Built around clarity, not dashboards for their own sake.
+            </h2>
+            <p className="max-w-xl text-base leading-8 text-[var(--app-text-muted)]">
+              Every surface is lighter, softer, and more structured. Gradients appear only where they create emphasis, not where they compete with information.
+            </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <FeatureCard 
-                icon={<Rocket size={24} />}
-                title="Resume Analysis"
-                description="Get instant feedback on your resume with ATS scoring and optimization tips."
-            />
-            <FeatureCard 
-                icon={<Target size={24} />}
-                title="Smart Matching"
-                description="Our AI engine ranks jobs based on your skills and career aspirations."
-            />
-            <FeatureCard 
-                icon={<Shield size={24} />}
-                title="Privacy First"
-                description="Your data is secure and you control who sees your professional profile."
-            />
-            <FeatureCard 
-                icon={<CheckCircle size={24} />}
-                title="Roadmap Builder"
-                description="Step-by-step career path generation to help you reach your dream role."
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-24 px-6 bg-[#F5F5F0]">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-12 text-center">
-          <div>
-            <div className="text-5xl lg:text-7xl font-bold mb-2">10k+</div>
-            <div className="text-[#141414]/60 uppercase tracking-widest text-xs font-bold">Resumes Analyzed</div>
-          </div>
-          <div>
-            <div className="text-5xl lg:text-7xl font-bold mb-2">85%</div>
-            <div className="text-[#141414]/60 uppercase tracking-widest text-xs font-bold">Interview rate increase</div>
-          </div>
-          <div>
-            <div className="text-5xl lg:text-7xl font-bold mb-2">500+</div>
-            <div className="text-[#141414]/60 uppercase tracking-widest text-xs font-bold">Partner Companies</div>
-          </div>
-        </div>
-      </section>
-
-      {/* User Types Section */}
-      <section className="py-24 px-6 bg-white overflow-hidden">
-        <div className="max-w-7xl mx-auto flex flex-col gap-24">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid gap-4">
+            {featureRows.map((feature, index) => (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ duration: 0.45, delay: index * 0.08 }}
+                className="panel-surface grid gap-4 rounded-[2rem] p-6 md:grid-cols-[auto_1fr_auto] md:items-center"
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[rgba(93,107,255,0.1)] text-[var(--app-accent)]">
+                  {feature.icon}
+                </div>
                 <div>
-                   <span className="text-[#F27D26] font-bold text-sm tracking-widest uppercase mb-4 block">For Job Seekers</span>
-                   <h2 className="text-5xl font-bold mb-6 tracking-tight leading-tight">Land your dream job with AI assistance.</h2>
-                   <ul className="space-y-4 mb-8">
-                        <li className="flex items-start gap-3">
-                            <CheckCircle size={20} className="text-[#F27D26] mt-1 shrink-0" />
-                            <p className="text-lg opacity-80">Personalized resume improvements that get past ATS filters.</p>
-                        </li>
-                        <li className="flex items-start gap-3">
-                            <CheckCircle size={20} className="text-[#F27D26] mt-1 shrink-0" />
-                            <p className="text-lg opacity-80">Automated job matching from thousands of listings.</p>
-                        </li>
-                        <li className="flex items-start gap-3">
-                            <CheckCircle size={20} className="text-[#F27D26] mt-1 shrink-0" />
-                            <p className="text-lg opacity-80">Skill gap analysis and roadmap generation for students.</p>
-                        </li>
-                   </ul>
-                   <Link to="/auth" className="inline-flex items-center gap-2 font-bold text-lg hover:gap-4 transition-all">
-                        Create Seeker Account <ArrowRight size={20} />
-                   </Link>
+                  <h3 className="text-lg font-semibold tracking-tight text-[var(--app-text)]">{feature.title}</h3>
+                  <p className="mt-2 text-sm leading-7 text-[var(--app-text-muted)]">{feature.description}</p>
                 </div>
-                <div className="relative">
-                    <div className="aspect-video bg-[#F5F5F0] rounded-2xl overflow-hidden border border-[#141414]/5 shadow-sm">
-                        <img 
-                            src="https://picsum.photos/seed/seeker/1200/800" 
-                            alt="Job Seeker" 
-                            className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" 
-                            referrerPolicy="no-referrer"
-                        />
-                    </div>
-                </div>
-            </div>
-
-            <div className="grid lg:grid-cols-2 gap-12 items-center md:flex-row-reverse">
-                <div className="lg:order-2">
-                   <span className="text-blue-500 font-bold text-sm tracking-widest uppercase mb-4 block">For Recruiters</span>
-                   <h2 className="text-5xl font-bold mb-6 tracking-tight leading-tight">Find top talent instantly with AI ranking.</h2>
-                   <ul className="space-y-4 mb-8">
-                        <li className="flex items-start gap-3">
-                            <CheckCircle size={20} className="text-blue-500 mt-1 shrink-0" />
-                            <p className="text-lg opacity-80">Advanced candidate scoring based on skills and context.</p>
-                        </li>
-                        <li className="flex items-start gap-3">
-                            <CheckCircle size={20} className="text-blue-500 mt-1 shrink-0" />
-                            <p className="text-lg opacity-80">Streamlined application management and collaboration.</p>
-                        </li>
-                        <li className="flex items-start gap-3">
-                            <CheckCircle size={20} className="text-blue-500 mt-1 shrink-0" />
-                            <p className="text-lg opacity-80">Automated outreach and interview scheduling assistance.</p>
-                        </li>
-                   </ul>
-                   <Link to="/auth" className="inline-flex items-center gap-2 font-bold text-lg hover:gap-4 transition-all">
-                        Post a Job Now <ArrowRight size={20} />
-                   </Link>
-                </div>
-                <div className="lg:order-1">
-                    <div className="aspect-video bg-[#F5F5F0] rounded-2xl overflow-hidden border border-[#141414]/5 shadow-sm">
-                        <img 
-                            src="https://picsum.photos/seed/recruiter/1200/800" 
-                            alt="Recruiter" 
-                            className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
-                            referrerPolicy="no-referrer"
-                        />
-                    </div>
-                </div>
-            </div>
+                <div className="text-sm font-semibold text-[var(--app-text-soft)]">0{index + 1}</div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* CTA Footer */}
-      <section className="py-24 px-6 bg-[#141414] text-[#F5F5F0] text-center">
-        <div className="max-w-3xl mx-auto">
-            <h2 className="text-5xl lg:text-7xl font-bold mb-8 tracking-tighter">Ready to accelerate your career?</h2>
+      <section className="px-6 py-16 md:py-20">
+        <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-2">
+          <AudiencePanel
+            eyebrow="For candidates"
+            title="A brighter path from resume upload to confident application."
+            description="From AI scoring to instructed cover letters and application history, the candidate experience stays readable and calm."
+            points={[
+              "Resume parsing with actionable improvement prompts",
+              "Regenerable AI match scoring per selected role",
+              "Tracked status updates with visible history over time",
+            ]}
+          />
+          <AudiencePanel
+            eyebrow="For recruiters"
+            title="Luxury polish without losing the operational edge."
+            description="Recruiter tools now surface views, applicants, and candidate progress inside cleaner, easier-to-scan analytics panels."
+            points={[
+              "Job listing analytics for views and application volume",
+              "Recent pipeline activity with AI fit context",
+              "Recruiter actions framed in softer, premium surfaces",
+            ]}
+            accent="secondary"
+          />
+        </div>
+      </section>
+
+      <section className="px-6 pb-16 md:pb-24">
+        <div className="gradient-surface mx-auto max-w-7xl rounded-[2.5rem] p-8 md:p-12">
+          <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
+            <div>
+              <div className="eyebrow">Final invitation</div>
+              <h2 className="mt-3 text-4xl font-semibold tracking-[-0.04em] text-[var(--app-text)] md:text-5xl">
+                Premium, light, trustworthy by default.
+              </h2>
+              <p className="mt-4 max-w-2xl text-base leading-8 text-[var(--app-text-muted)]">
+                ApplyIQ now feels less like a generic AI dashboard and more like a deliberate product for career progress and recruiter decision-making.
+              </p>
+            </div>
             <Link
-                to="/auth"
-                className="inline-flex px-12 py-6 bg-[#F27D26] text-[#141414] rounded-full text-xl font-bold hover:scale-105 transition-transform"
+              to="/auth"
+              className="button-primary inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-sm font-semibold transition-all"
             >
-                Join ApplyIQ Today
+              Enter the workspace <ArrowRight size={18} />
             </Link>
-            <p className="mt-8 text-[#F5F5F0]/40 text-sm mono uppercase tracking-widest">Free tier available • No credit card required</p>
+          </div>
         </div>
       </section>
-
-      {/* Minimal Footer */}
-      <footer className="py-12 px-6 border-t border-[#141414]/10 bg-white">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="flex items-center gap-2">
-                <Zap size={20} />
-                <span className="font-bold text-lg font-sans">ApplyIQ</span>
-            </div>
-            <div className="text-sm text-[#141414]/50">
-                &copy; 2026 ApplyIQ Inc. All rights reserved.
-            </div>
-            <div className="flex gap-8 text-sm font-medium">
-                <a href="#" className="hover:opacity-60 transition-opacity">Privacy</a>
-                <a href="#" className="hover:opacity-60 transition-opacity">Terms</a>
-                <a href="#" className="hover:opacity-60 transition-opacity">Support</a>
-            </div>
-        </div>
-      </footer>
     </div>
   );
 }
 
-function FeatureCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
+function MetricCard({ value, label }: { value: string; label: string }) {
   return (
-    <div className="p-8 rounded-2xl border border-[#141414]/5 hover:border-[#141414]/20 bg-[#F5F5F0]/30 transition-all group">
-      <div className="w-12 h-12 rounded-xl bg-[#141414] text-[#F5F5F0] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-        {icon}
+    <div className="metric-pill rounded-[1.6rem] px-5 py-4">
+      <div className="text-2xl font-semibold tracking-tight text-[var(--app-text)]">{value}</div>
+      <div className="mt-1 text-xs uppercase tracking-[0.22em] text-[var(--app-text-soft)]">{label}</div>
+    </div>
+  );
+}
+
+function MiniPanel({
+  title,
+  value,
+  suffix,
+}: {
+  title: string;
+  value: string;
+  suffix?: string;
+}) {
+  return (
+    <div className="rounded-[1.5rem] border border-white/80 bg-white/72 p-4 shadow-sm">
+      <div className="text-[11px] uppercase tracking-[0.22em] text-[var(--app-text-soft)]">{title}</div>
+      <div className="mt-2 text-2xl font-semibold tracking-tight text-[var(--app-text)]">
+        {value}
+        {suffix ? <span className="text-base text-[var(--app-text-soft)]">{suffix}</span> : null}
       </div>
-      <h4 className="text-xl font-bold mb-3">{title}</h4>
-      <p className="text-[#141414]/60 text-sm leading-relaxed">{description}</p>
+    </div>
+  );
+}
+
+function AudiencePanel({
+  eyebrow,
+  title,
+  description,
+  points,
+  accent = "primary",
+}: {
+  eyebrow: string;
+  title: string;
+  description: string;
+  points: string[];
+  accent?: "primary" | "secondary";
+}) {
+  const accentClass =
+    accent === "secondary"
+      ? "bg-[linear-gradient(135deg,rgba(163,140,247,0.12),rgba(93,107,255,0.05))]"
+      : "bg-[linear-gradient(135deg,rgba(93,107,255,0.1),rgba(163,140,247,0.08))]";
+
+  return (
+    <div className={`panel-surface rounded-[2.25rem] p-8 ${accentClass}`}>
+      <div className="eyebrow">{eyebrow}</div>
+      <h3 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-[var(--app-text)]">{title}</h3>
+      <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--app-text-muted)]">{description}</p>
+      <div className="mt-8 space-y-4">
+        {points.map((point) => (
+          <div key={point} className="flex items-start gap-3">
+            <div className="mt-1 flex h-6 w-6 items-center justify-center rounded-full bg-white/88 text-[var(--app-accent)] shadow-sm">
+              <CheckCircle2 size={14} />
+            </div>
+            <p className="text-sm leading-7 text-[var(--app-text)]">{point}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

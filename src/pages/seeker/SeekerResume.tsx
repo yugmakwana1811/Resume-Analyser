@@ -20,6 +20,10 @@ export default function SeekerResume({ user }: { user: User }) {
     setLoading(true);
     try {
       const res = await fetch(`/api/profile/${user?.id}`);
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({}));
+        throw new Error(error.error || "Unable to load your profile.");
+      }
       const data = await res.json();
       setProfile(data);
     } catch (err) {
@@ -33,6 +37,16 @@ export default function SeekerResume({ user }: { user: User }) {
     const file = e.target.files?.[0];
     if (!file || !profile) return;
 
+    if (!["application/pdf", "text/plain"].includes(file.type)) {
+      alert("Please upload a PDF or TXT resume.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Please upload a file smaller than 5 MB.");
+      return;
+    }
+
     setUploading(true);
     const formData = new FormData();
     formData.append("resume", file);
@@ -43,9 +57,13 @@ export default function SeekerResume({ user }: { user: User }) {
         method: "POST",
         body: formData,
       });
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({}));
+        throw new Error(error.error || "Unable to upload your resume.");
+      }
       const data = await res.json();
-      setProfile({ ...profile, resume: data });
-      handleAnalyze(data.content);
+      setProfile((current: any) => ({ ...current, resume: data }));
+      await handleAnalyze(data.content);
     } catch (err) {
       console.error(err);
     } finally {
@@ -67,7 +85,7 @@ export default function SeekerResume({ user }: { user: User }) {
       setImprovementResult(improvements);
 
       // Save improved data to profile
-      await fetch(`/api/profile/${user?.id}`, {
+      const response = await fetch(`/api/profile/${user?.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -78,6 +96,11 @@ export default function SeekerResume({ user }: { user: User }) {
            education: result.education
         })
       });
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.error || "Unable to save your profile updates.");
+      }
+      await fetchProfile();
       
     } catch (err) {
       console.error(err);

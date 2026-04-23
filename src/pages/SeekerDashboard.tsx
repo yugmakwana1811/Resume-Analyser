@@ -28,13 +28,13 @@ export default function SeekerDashboard({ user }: SeekerDashboardProps) {
   if (!user) return null;
 
   return (
-    <div className="flex h-[calc(100vh-68px)]">
+    <div className="app-shell flex h-[calc(100vh-76px)]">
       {/* Sidebar */}
-      <aside className="w-64 border-r border-[#141414]/10 bg-white flex flex-col">
+      <aside className="app-sidebar hidden w-72 flex-col lg:flex">
         <div className="p-6">
-          <div className="bg-[#141414]/5 rounded-xl p-4 mb-8">
-            <div className="text-xs uppercase tracking-widest font-bold text-[#141414]/40 mb-1">Signed in as</div>
-            <div className="text-sm font-bold truncate">{user.email}</div>
+          <div className="accent-surface mb-8 rounded-[1.6rem] p-5">
+            <div className="eyebrow mb-2">Signed in as</div>
+            <div className="truncate text-sm font-semibold text-[var(--app-text)]">{user.email}</div>
           </div>
 
           <nav className="space-y-1">
@@ -83,14 +83,16 @@ export default function SeekerDashboard({ user }: SeekerDashboardProps) {
           </nav>
         </div>
 
-        <div className="mt-auto p-6 border-t border-[#141414]/5">
-            <div className="bg-orange-50 border border-orange-100 rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-2">
-                    <Zap size={16} className="text-[#F27D26]" />
-                    <span className="text-xs font-bold uppercase tracking-widest text-[#F27D26]">Pro Status</span>
+        <div className="mt-auto border-t border-[rgba(41,49,81,0.08)] p-6">
+            <div className="gradient-surface rounded-[1.7rem] p-5">
+                <div className="mb-2 flex items-center gap-2">
+                    <Zap size={16} className="text-[var(--app-accent)]" />
+                    <span className="eyebrow text-[var(--app-accent)]">Pro Status</span>
                 </div>
-                <p className="text-xs text-[#141414]/60 mb-3 leading-relaxed">Unlock advanced AI analysis and unlimited matches.</p>
-                <button className="w-full py-2 bg-[#F27D26] text-[#141414] text-xs font-bold rounded-lg hover:opacity-90 transition-opacity">
+                <p className="mb-3 text-xs leading-relaxed text-[var(--app-text-muted)]">
+                  Unlock advanced AI analysis and unlimited matches.
+                </p>
+                <button className="button-primary w-full rounded-xl py-2.5 text-xs font-semibold transition-all">
                     Upgrade Now
                 </button>
             </div>
@@ -98,8 +100,8 @@ export default function SeekerDashboard({ user }: SeekerDashboardProps) {
       </aside>
 
       {/* Content Area */}
-      <main className="flex-1 overflow-y-auto bg-[#F5F5F0]/30 p-8">
-        <div className="max-w-5xl mx-auto">
+      <main className="app-workspace flex-1 overflow-y-auto p-5 md:p-8">
+        <div className="mx-auto max-w-6xl">
           <Routes>
             <Route path="/" element={<SeekerOverview user={user} />} />
             <Route path="/overview" element={<SeekerOverview user={user} />} />
@@ -120,10 +122,10 @@ function SidebarLink({ to, icon, label, active }: { to: string, icon: React.Reac
   return (
     <Link 
       to={to} 
-      className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+      className={`flex items-center gap-3 rounded-[1rem] px-4 py-3 text-sm font-semibold transition-all ${
         active 
-          ? "bg-[#141414] text-[#F5F5F0] shadow-lg shadow-[#141414]/10" 
-          : "text-[#141414]/60 hover:bg-[#141414]/5 hover:text-[#141414]"
+          ? "nav-link-luxury-active"
+          : "nav-link-luxury"
       }`}
     >
       {icon}

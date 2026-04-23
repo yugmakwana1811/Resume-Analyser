@@ -17,6 +17,10 @@ export default function SeekerRoadmap({ user }: { user: User }) {
   const fetchProfile = async () => {
     try {
       const res = await fetch(`/api/profile/${user?.id}`);
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({}));
+        throw new Error(error.error || "Unable to load your profile.");
+      }
       setProfile(await res.json());
     } catch (err) { console.error(err); }
   };

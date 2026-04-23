@@ -43,86 +43,134 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
   };
 
   return (
-    <div className="min-h-[calc(100vh-80px)] flex items-center justify-center p-6">
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md bg-white p-10 rounded-3xl shadow-xl border border-[#141414]/5"
-      >
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold tracking-tight mb-2">
-            {isLogin ? "Welcome back" : "Create an account"}
-          </h1>
-          <p className="text-[#141414]/60 text-sm">
-            {isLogin ? "Enter your credentials to access your dashboard" : "Join thousands of professionals on ApplyIQ"}
-          </p>
-        </div>
-
-        {!isLogin && (
-          <div className="flex gap-2 mb-8 p-1 bg-[#F5F5F0] rounded-xl">
-            <button
-              onClick={() => setRole("SEEKER")}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-bold transition-all ${
-                role === "SEEKER" ? "bg-white shadow-sm text-[#141414]" : "text-[#141414]/40 hover:text-[#141414]/60"
-              }`}
-            >
-              <UserIcon size={16} /> Job Seeker
-            </button>
-            <button
-              onClick={() => setRole("RECRUITER")}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-bold transition-all ${
-                role === "RECRUITER" ? "bg-white shadow-sm text-[#141414]" : "text-[#141414]/40 hover:text-[#141414]/60"
-              }`}
-            >
-              <Briefcase size={16} /> Recruiter
-            </button>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="app-shell min-h-[calc(100vh-80px)] px-6 py-10">
+      <div className="mx-auto grid max-w-6xl items-stretch gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+        <motion.div
+          initial={{ opacity: 0, x: -18 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="gradient-surface hidden rounded-[2.5rem] p-10 lg:flex lg:flex-col lg:justify-between"
+        >
           <div>
-            <label className="block text-xs uppercase tracking-widest font-bold text-[#141414]/40 mb-2 ml-1">Email Address</label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 bg-[#F5F5F0] border-none rounded-xl focus:ring-2 focus:ring-[#141414] transition-all outline-none"
-              placeholder="alex@example.com"
-            />
-          </div>
-          <div>
-            <label className="block text-xs uppercase tracking-widest font-bold text-[#141414]/40 mb-2 ml-1">Password</label>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 bg-[#F5F5F0] border-none rounded-xl focus:ring-2 focus:ring-[#141414] transition-all outline-none"
-              placeholder="••••••••"
-            />
+            <div className="eyebrow">ApplyIQ Workspace</div>
+            <h1 className="mt-4 text-5xl font-semibold tracking-[-0.05em] text-[var(--app-text)]">
+              The elegant way to manage modern hiring momentum.
+            </h1>
+            <p className="mt-5 max-w-lg text-base leading-8 text-[var(--app-text-muted)]">
+              Premium light-theme surfaces, intelligent matching, and calmer workflows for both sides of the hiring journey.
+            </p>
           </div>
 
-          {error && <p className="text-red-500 text-xs font-bold text-center bg-red-50 py-2 rounded-lg">{error}</p>}
+          <div className="space-y-4">
+            {[
+              "Instruction-aware AI cover letters before you apply",
+              "Recruiter analytics with views, applicants, and live status history",
+              "Luxury visual hierarchy built for trust and readability",
+            ].map((item) => (
+              <div key={item} className="flex items-start gap-3 rounded-[1.5rem] border border-white/70 bg-white/70 p-4 shadow-sm">
+                <div className="mt-1 rounded-full bg-[rgba(93,107,255,0.1)] p-2 text-[var(--app-accent)]">
+                  <ArrowRight size={14} />
+                </div>
+                <p className="text-sm leading-7 text-[var(--app-text)]">{item}</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
 
-          <button
-            disabled={loading}
-            className="w-full py-4 bg-[#141414] text-[#F5F5F0] rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50"
-          >
-            {loading ? <Loader2 className="animate-spin" size={20} /> : (isLogin ? "Login" : "Create Account")}
-            {!loading && <ArrowRight size={18} />}
-          </button>
-        </form>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="panel-surface-strong mx-auto w-full max-w-xl rounded-[2.5rem] p-8 md:p-10"
+        >
+          <div className="mb-8">
+            <div className="eyebrow">{isLogin ? "Welcome back" : "Create your workspace"}</div>
+            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-[var(--app-text)]">
+              {isLogin ? "Sign in to continue" : "Open an ApplyIQ account"}
+            </h2>
+            <p className="mt-3 text-sm leading-7 text-[var(--app-text-muted)]">
+              {isLogin
+                ? "Enter your credentials to access your premium hiring dashboard."
+                : "Choose the experience that fits your role and start with a cleaner product workflow."}
+            </p>
+          </div>
 
-        <div className="mt-8 text-center text-sm">
-          <button
-            onClick={() => setIsLogin(!isLogin)}
-            className="text-[#141414]/40 font-medium hover:text-[#141414] transition-colors"
-          >
-            {isLogin ? "Don't have an account? Sign up" : "Already have an account? Login"}
-          </button>
-        </div>
-      </motion.div>
+          {!isLogin && (
+            <div className="panel-muted mb-8 flex gap-2 rounded-[1.4rem] p-1.5">
+              <button
+                onClick={() => setRole("SEEKER")}
+                className={`flex flex-1 items-center justify-center gap-2 rounded-[1rem] px-4 py-3 text-sm font-semibold transition-all ${
+                  role === "SEEKER"
+                    ? "nav-link-luxury-active"
+                    : "nav-link-luxury"
+                }`}
+              >
+                <UserIcon size={16} /> Job Seeker
+              </button>
+              <button
+                onClick={() => setRole("RECRUITER")}
+                className={`flex flex-1 items-center justify-center gap-2 rounded-[1rem] px-4 py-3 text-sm font-semibold transition-all ${
+                  role === "RECRUITER"
+                    ? "nav-link-luxury-active"
+                    : "nav-link-luxury"
+                }`}
+              >
+                <Briefcase size={16} /> Recruiter
+              </button>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="mb-2 ml-1 block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--app-text-soft)]">
+                Email Address
+              </label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="field-shell w-full rounded-2xl px-4 py-3.5 text-sm text-[var(--app-text)] transition-all"
+                placeholder="alex@example.com"
+              />
+            </div>
+            <div>
+              <label className="mb-2 ml-1 block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--app-text-soft)]">
+                Password
+              </label>
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="field-shell w-full rounded-2xl px-4 py-3.5 text-sm text-[var(--app-text)] transition-all"
+                placeholder="At least 8 characters"
+              />
+            </div>
+
+            {error && (
+              <p className="rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-center text-xs font-semibold text-red-600">
+                {error}
+              </p>
+            )}
+
+            <button
+              disabled={loading}
+              className="button-primary flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-sm font-semibold transition-all disabled:opacity-50"
+            >
+              {loading ? <Loader2 className="animate-spin" size={20} /> : isLogin ? "Login" : "Create Account"}
+              {!loading && <ArrowRight size={18} />}
+            </button>
+          </form>
+
+          <div className="mt-8 text-center text-sm">
+            <button
+              onClick={() => setIsLogin(!isLogin)}
+              className="font-medium text-[var(--app-text-muted)] transition-colors hover:text-[var(--app-text)]"
+            >
+              {isLogin ? "Don't have an account? Sign up" : "Already have an account? Login"}
+            </button>
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 }

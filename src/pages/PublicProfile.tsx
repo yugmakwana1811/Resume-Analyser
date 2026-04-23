@@ -1,61 +1,92 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { User, Briefcase, GraduationCap, Award, MapPin, Mail, Share2, Download } from "lucide-react";
+import { Briefcase, GraduationCap, Award, MapPin, Share2, Download } from "lucide-react";
+import { safeJsonParse } from "../lib/utils";
 
 export default function PublicProfile() {
     const { userId } = useParams();
     const [profile, setProfile] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
     useEffect(() => {
-        // In a real app, fetch from API. For demo, we'll use placeholder or match route
-        fetch(`/api/profile/${userId}`)
-            .then(res => res.json())
-            .then(data => setProfile(data))
-            .finally(() => setLoading(false));
+        const fetchProfile = async () => {
+            try {
+                const response = await fetch(`/api/profile/${userId}`);
+                if (!response.ok) {
+                    const payload = await response.json().catch(() => ({}));
+                    throw new Error(payload.error || "Unable to load this profile.");
+                }
+
+                setProfile(await response.json());
+            } catch (err: any) {
+                setError(err.message || "Unable to load this profile.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProfile();
     }, [userId]);
 
     if (loading) return <div className="h-screen flex items-center justify-center font-sans uppercase tracking-[0.2em] opacity-40">Accessing Profile Registry...</div>;
+    if (error) return <div className="h-screen flex items-center justify-center px-6 text-center font-sans text-lg">{error}</div>;
 
     // Sample data fallback for the recruiter demo
+    const fallbackExperience = [{
+        title: "Senior Technical Lead",
+        company: "Tech Giant Corp",
+        period: "2022 - Present",
+        description: "Orchestrated the migration of legacy architecture to modern microservices, resulting in 40% performance improvement."
+    }];
+    const fallbackEducation = [{
+        institution: "Stanford University",
+        degree: "M.S. Computer Science",
+        year: "2020"
+    }];
     const d = {
         name: profile?.name || "Professional Identity",
         headline: profile?.headline || "Software Engineering Excellence",
         bio: profile?.bio || "Highly motivated professional with extensive experience in developing scalable distributed systems and leading cross-functional teams.",
-        skills: profile?.skills ? JSON.parse(profile.skills) : ["System Design", "Cloud Infrastructure", "Rapid Prototyping"],
-        experience: profile?.experience ? JSON.parse(profile.experience) : [{ 
-            title: "Senior Technical Lead", 
-            company: "Tech Giant Corp", 
-            period: "2022 - Present", 
-            description: "Orchestrated the migration of legacy architecture to modern microservices, resulting in 40% performance improvement." 
-        }],
-        education: profile?.education ? JSON.parse(profile.education) : [{ 
-            institution: "Stanford University", 
-            degree: "M.S. Computer Science", 
-            year: "2020" 
-        }]
+        skills: safeJsonParse<string[]>(profile?.skills, ["System Design", "Cloud Infrastructure", "Rapid Prototyping"]),
+        experience: safeJsonParse<any[]>(profile?.experience, fallbackExperience),
+        education: safeJsonParse<any[]>(profile?.education, fallbackEducation)
     };
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className="app-shell min-h-screen">
             {/* Split Header */}
             <div className="grid lg:grid-cols-2">
-                <div className="bg-[#141414] text-[#F5F5F0] p-12 md:p-24 flex flex-col justify-center">
+                <div className="gradient-surface flex flex-col justify-center p-12 md:p-24">
                     <div className="flex items-center gap-4 mb-12">
-                        <div className="w-12 h-12 bg-[#F27D26] rounded-2xl"></div>
-                        <div className="text-[10px] uppercase font-bold tracking-[0.2em] opacity-40 font-mono">Profile // verified</div>
+                        <div className="brand-mark h-12 w-12 rounded-2xl"></div>
+                        <div className="text-[10px] uppercase font-bold tracking-[0.2em] text-[var(--app-text-soft)] font-mono">Profile // verified</div>
                     </div>
-                    <h1 className="text-6xl md:text-8xl font-black tracking-tight leading-[0.85] mb-8 uppercase">
+                    <h1 className="mb-8 text-6xl font-semibold uppercase leading-[0.85] tracking-tight md:text-8xl">
                         {d.name.split(' ')[0]} <br />
-                        <span className="text-[#F27D26]">{d.name.split(' ')[1] || ''}</span>
+                        <span className="text-[var(--app-accent)]">{d.name.split(' ')[1] || ''}</span>
                     </h1>
-                    <p className="text-2xl font-light opacity-60 mb-12">{d.headline}</p>
+                    <p className="mb-12 text-2xl font-light text-[var(--app-text-muted)]">{d.headline}</p>
                     <div className="flex flex-wrap gap-4">
-                        <button className="px-6 py-3 bg-[#F27D26] text-[#141414] rounded-full font-bold text-sm flex items-center gap-2">
-                            Contact Professional <Mail size={16} />
+                        <button
+                            type="button"
+                            onClick={async () => {
+                                try {
+                                    await navigator.clipboard.writeText(window.location.href);
+                                } catch (err) {
+                                    console.error(err);
+                                }
+                            }}
+                            className="button-primary flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-all"
+                        >
+                            Copy Profile Link <Share2 size={16} />
                         </button>
-                        <button className="px-6 py-3 border border-white/20 rounded-full font-bold text-sm flex items-center gap-2 hover:bg-white/10 transition-colors">
-                            Download Resume <Download size={16} />
+                        <button
+                            type="button"
+                            onClick={() => window.print()}
+                            className="button-secondary flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-all"
+                        >
+                            Save as PDF <Download size={16} />
                         </button>
                     </div>
                 </div>
@@ -70,7 +101,7 @@ export default function PublicProfile() {
                         <h2 className="text-[10px] uppercase font-bold tracking-[0.4em] text-[#141414]/30 mb-8 border-b pb-4">Core Competencies</h2>
                         <div className="flex flex-wrap gap-3">
                             {d.skills.map((skill: string, i: number) => (
-                                <span key={i} className="px-5 py-2 bg-[#F5F5F0] rounded-xl text-xs font-bold uppercase tracking-widest">{skill}</span>
+                                <span key={i} className="panel-muted rounded-xl px-5 py-2 text-xs font-semibold uppercase tracking-widest">{skill}</span>
                             ))}
                         </div>
                     </section>
@@ -107,7 +138,7 @@ export default function PublicProfile() {
                         </h2>
                         <div className="grid md:grid-cols-2 gap-8">
                             {d.education.map((edu: any, i: number) => (
-                                <div key={i} className="p-8 bg-[#F5F5F0] rounded-[2rem]">
+                                <div key={i} className="panel-surface rounded-[2rem] p-8">
                                     <h3 className="font-bold text-lg mb-1">{edu.degree}</h3>
                                     <p className="text-[#141414]/60 text-sm mb-4">{edu.institution}</p>
                                     <div className="text-[10px] font-bold uppercase tracking-widest px-3 py-1 bg-white inline-block rounded-md shadow-sm">Class of {edu.year}</div>
@@ -119,10 +150,20 @@ export default function PublicProfile() {
 
                 <div className="lg:col-span-1">
                     <div className="sticky top-32 space-y-8">
-                        <div className="p-8 border-2 border-[#141414] rounded-[2rem]">
+                        <div className="panel-surface rounded-[2rem] p-8">
                             <h4 className="font-black text-xs uppercase tracking-[0.2em] mb-8">Share Knowledge</h4>
                             <div className="space-y-4">
-                                <button className="w-full flex items-center justify-between p-4 bg-[#F5F5F0] rounded-xl hover:bg-[#141414] hover:text-white transition-all group">
+                                <button
+                                    type="button"
+                                    onClick={async () => {
+                                        try {
+                                            await navigator.clipboard.writeText(window.location.href);
+                                        } catch (err) {
+                                            console.error(err);
+                                        }
+                                    }}
+                                    className="button-secondary group flex w-full items-center justify-between rounded-xl p-4 transition-all"
+                                >
                                     <span className="font-bold text-sm">Copy Profile Link</span>
                                     <Share2 size={18} className="opacity-20 group-hover:opacity-100" />
                                 </button>
@@ -136,7 +177,7 @@ export default function PublicProfile() {
                             </div>
                         </div>
 
-                        <div className="p-8 bg-[#F5F5F0] rounded-[2rem]">
+                        <div className="panel-surface rounded-[2rem] p-8">
                             <h4 className="font-black text-xs uppercase tracking-[0.2em] mb-6">Location</h4>
                             <div className="flex items-center gap-2 text-sm font-bold opacity-60">
                                 <MapPin size={16} /> San Francisco, CA (Open to Remote)
