@@ -1,9 +1,10 @@
 import "dotenv/config";
 import crypto from "crypto";
 import express from "express";
-import { createServer as createViteServer } from "vite";
 import { PrismaClient } from "@prisma/client";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import Database from "better-sqlite3";
+import { existsSync, mkdirSync, readFileSync } from "fs";
 import path from "path";
 import multer from "multer";
 import { PDFParse } from "pdf-parse";
@@ -41,8 +42,23 @@ interface AuthenticatedRequest extends express.Request {
   auth?: AuthPayload | null;
 }
 
+type AppRuntime = "dev" | "node" | "vercel";
+
+const DEFAULT_DATABASE_URL = process.env.VERCEL ? "file:/tmp/applyiq.db" : "file:./dev.db";
+const DATABASE_URL = process.env.DATABASE_URL || DEFAULT_DATABASE_URL;
+
+function resolveSqliteFilePath(databaseUrl: string) {
+  if (!databaseUrl.startsWith("file:")) {
+    throw new Error("ApplyIQ currently expects a SQLite DATABASE_URL.");
+  }
+
+  const rawPath = databaseUrl.slice("file:".length);
+  return path.isAbsolute(rawPath) ? rawPath : path.resolve(process.cwd(), rawPath);
+}
+
+const DATABASE_FILE_PATH = resolveSqliteFilePath(DATABASE_URL);
 const adapter = new PrismaBetterSqlite3({
-  url: process.env.DATABASE_URL || "file:./dev.db",
+  url: DATABASE_URL,
 });
 const prisma = new PrismaClient({ adapter });
 const upload = multer({
@@ -55,6 +71,8 @@ const SESSION_COOKIE_NAME = "applyiq_session";
 const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 30;
 const SESSION_SECRET = process.env.SESSION_SECRET || "applyiq-dev-session-secret";
 const ALLOWED_RESUME_TYPES = new Set(["application/pdf", "text/plain"]);
+const appPromises = new Map<AppRuntime, Promise<express.Express>>();
+let databaseInitialized = false;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -350,10 +368,38 @@ async function seedSampleJobs() {
   console.log("Sample jobs seeded.");
 }
 
-async function startServer() {
-  const app = express();
+function resolveInitSqlPath() {
+  const candidates = [
+    path.resolve(process.cwd(), "prisma/init.sql"),
+    path.resolve(__dirname, "prisma/init.sql"),
+  ];
+
+  const match = candidates.find((candidate) => existsSync(candidate));
+  if (!match) {
+    throw new Error("Could not locate prisma/init.sql for database initialization.");
+  }
+
+  return match;
+}
+
+async function initializeDatabase() {
+  if (databaseInitialized) return;
+
+  mkdirSync(path.dirname(DATABASE_FILE_PATH), { recursive: true });
+
+  const bootstrapDb = new Database(DATABASE_FILE_PATH);
+  bootstrapDb.pragma("foreign_keys = ON");
+  bootstrapDb.exec(readFileSync(resolveInitSqlPath(), "utf8"));
+  bootstrapDb.close();
 
   await ensureLegacyCompatibility();
+  databaseInitialized = true;
+}
+
+async function createAppInternal(runtime: AppRuntime) {
+  const app = express();
+
+  await initializeDatabase();
   app.use(express.json({ limit: "2mb" }));
   app.use((req, _res, next) => {
     (req as AuthenticatedRequest).auth = readAuthFromRequest(req);
@@ -1309,14 +1355,15 @@ async function startServer() {
   });
 
   // --- VITE MIDDLEWARE ---
-  if (process.env.NODE_ENV !== "production") {
+  if (runtime === "dev") {
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
     });
 
     app.use(vite.middlewares);
-  } else {
+  } else if (runtime === "node") {
     const distPath = path.join(process.cwd(), "dist");
     app.use(express.static(distPath));
     app.get("*", (_req, res) => {
@@ -1326,12 +1373,36 @@ async function startServer() {
 
   await seedSampleJobs();
 
+  return app;
+}
+
+export async function createApp(runtime: AppRuntime = process.env.VERCEL
+  ? "vercel"
+  : process.env.NODE_ENV === "production"
+    ? "node"
+    : "dev") {
+  const existing = appPromises.get(runtime);
+  if (existing) {
+    return existing;
+  }
+
+  const created = createAppInternal(runtime);
+  appPromises.set(runtime, created);
+  return created;
+}
+
+export async function startServer() {
+  const runtime: AppRuntime = process.env.NODE_ENV === "production" ? "node" : "dev";
+  const app = await createApp(runtime);
+
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
 }
 
-startServer().catch((error) => {
-  console.error("Failed to start server", error);
-  process.exit(1);
-});
+if (process.argv[1] && path.resolve(process.argv[1]) === __filename) {
+  startServer().catch((error) => {
+    console.error("Failed to start server", error);
+    process.exit(1);
+  });
+}
