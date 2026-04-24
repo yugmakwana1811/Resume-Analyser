@@ -343,6 +343,10 @@
     color: var(--app-accent);
   }
 
+  .font-handwritten {
+    font-family: var(--font-sans);
+  }
+
   .brand-mark {
     background: linear-gradient(135deg, rgba(47, 103, 255, 0.92), rgba(76, 185, 214, 0.9));
     box-shadow: 0 18px 34px rgba(47, 103, 255, 0.24);

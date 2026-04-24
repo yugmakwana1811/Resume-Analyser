@@ -4,6 +4,9 @@ import { HeroScrollDemo } from "../components/HeroScrollDemo";
 import { HeroDemo } from "../components/HeroDemo";
 import { SparklesDemo } from "../components/SparklesDemo";
 import { GeometricHeroDemo } from "../components/GeometricHeroDemo";
+import { CreativePricingDemo } from "../components/CreativePricingDemo";
+import { ProgressIndicatorDemo } from "../components/ProgressIndicatorDemo";
+import { RemotionShowcase } from "../components/RemotionShowcase";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
@@ -258,6 +261,61 @@ export default function LandingPage() {
             ]}
             secondary
           />
+        </div>
+      </section>
+
+      <section className="px-4 py-10 md:px-6 md:py-14">
+        <div className="page-frame">
+          <div className="section-shell rounded-[2.75rem] px-7 py-10 md:px-12 md:py-14">
+            <div className="grid gap-10 lg:grid-cols-[1fr_0.9fr] lg:items-center">
+              <div>
+                <div className="eyebrow mb-3">Interaction module</div>
+                <h2 className="text-balance text-4xl font-semibold tracking-[-0.05em] md:text-5xl">
+                  Progress that feels alive, but stays controlled.
+                </h2>
+                <p className="mt-5 max-w-xl text-base leading-8 text-[var(--app-text-muted)]">
+                  A compact stepper component you can reuse for onboarding, application steps, and recruiter workflows.
+                </p>
+              </div>
+              <div className="panel-surface rounded-[2.25rem] p-8 md:p-10">
+                <ProgressIndicatorDemo />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-4 py-10 md:px-6 md:py-14">
+        <div className="page-frame">
+          <div className="page-hero px-6 py-10 md:px-10 md:py-12">
+            <div className="eyebrow mb-3">Pricing module</div>
+            <h2 className="text-balance text-4xl font-semibold tracking-[-0.05em] md:text-5xl">
+              Component drop-in: creative pricing
+            </h2>
+            <p className="mt-5 max-w-3xl text-base leading-8 text-[var(--app-text-muted)]">
+              This is integrated as-is for your component library. It can be re-skinned to match ApplyIQ’s luxury-light system.
+            </p>
+            <div className="mt-10">
+              <CreativePricingDemo />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-4 py-10 md:px-6 md:py-14">
+        <div className="page-frame">
+          <div className="page-hero px-6 py-10 md:px-10 md:py-12">
+            <div className="eyebrow mb-3">Motion graphics</div>
+            <h2 className="text-balance text-4xl font-semibold tracking-[-0.05em] md:text-5xl">
+              Remotion scenes embedded inside the product surface.
+            </h2>
+            <p className="mt-5 max-w-3xl text-base leading-8 text-[var(--app-text-muted)]">
+              These demos are powered by `remotion` + `@remotion/player` and can be repurposed for marketing, onboarding, or in-product moments.
+            </p>
+            <div className="mt-10">
+              <RemotionShowcase />
+            </div>
+          </div>
         </div>
       </section>
     </div>
