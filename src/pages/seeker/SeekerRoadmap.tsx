@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { User } from "../../App";
 import { motion, AnimatePresence } from "motion/react";
-import { Map, ArrowRight, Zap, Loader2, Target, Calendar, ListChecks, Sparkles } from "lucide-react";
+import { ArrowRight, Zap, Loader2, Target, Calendar, ListChecks, Sparkles } from "lucide-react";
 import { aiService } from "../../services/aiService";
 
 export default function SeekerRoadmap({ user }: { user: User }) {
@@ -16,13 +16,15 @@ export default function SeekerRoadmap({ user }: { user: User }) {
 
   const fetchProfile = async () => {
     try {
-      const res = await fetch(`/api/profile/${user?.id}`);
-      if (!res.ok) {
-        const error = await res.json().catch(() => ({}));
+      const response = await fetch(`/api/profile/${user?.id}`);
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
         throw new Error(error.error || "Unable to load your profile.");
       }
-      setProfile(await res.json());
-    } catch (err) { console.error(err); }
+      setProfile(await response.json());
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleGenerate = async () => {
@@ -31,130 +33,140 @@ export default function SeekerRoadmap({ user }: { user: User }) {
     try {
       const result = await aiService.generateRoadmap(targetRole, profile);
       setRoadmap(result);
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error(error);
     } finally {
       setGenerating(false);
     }
   };
 
   return (
-    <div className="space-y-8 pb-20">
-      <header>
-        <h1 className="text-4xl font-bold tracking-tight mb-2">Career Roadmap</h1>
-        <p className="text-[#141414]/60">Where do you want to be in 2 years? We'll show you the exact steps to get there.</p>
+    <div className="space-y-6 pb-20">
+      <header className="page-hero overflow-hidden px-6 py-7 md:px-8 md:py-9">
+        <div className="eyebrow mb-2">Career Roadmap</div>
+        <h1 className="text-balance text-4xl font-semibold tracking-[-0.05em] md:text-5xl">
+          Build a concrete path from where you are to where you want to be.
+        </h1>
+        <p className="mt-4 max-w-2xl text-base leading-8 text-[var(--app-text-muted)]">
+          Set your target role and generate a step-by-step progression plan with milestones, skills, and duration estimates.
+        </p>
       </header>
 
-      {/* Input Section */}
-      <section className="bg-white p-10 rounded-[2.5rem] border border-[#141414]/5">
-         <div className="max-w-xl">
-            <label className="block text-xs uppercase font-bold tracking-[0.2em] text-[#141414]/40 mb-3 ml-1">Target Professional Role</label>
-            <div className="flex gap-4">
-                <div className="flex-1 relative">
-                    <Target className="absolute left-4 top-1/2 -translate-y-1/2 text-[#141414]/20" size={20} />
-                    <input 
-                        type="text" 
-                        placeholder="e.g. Senior Frontend Architect, Product Manager"
-                        className="w-full pl-12 pr-4 py-4 bg-[#F5F5F0] rounded-2xl border-none outline-none font-medium focus:ring-2 focus:ring-[#141414] transition-all"
-                        value={targetRole}
-                        onChange={(e) => setTargetRole(e.target.value)}
-                    />
-                </div>
-                <button 
-                    onClick={handleGenerate}
-                    disabled={generating || !targetRole}
-                    className="px-8 py-4 bg-[#141414] text-[#F5F5F0] rounded-2xl font-bold flex items-center gap-2 hover:opacity-90 transition-all disabled:opacity-50"
-                >
-                    {generating ? <Loader2 size={20} className="animate-spin" /> : <Zap size={20} className="text-[#F27D26]" />}
-                    {generating ? 'Generating...' : 'Build Path'}
-                </button>
+      <section className="section-shell rounded-[2rem] p-6 md:p-7">
+        <div className="max-w-3xl">
+          <label className="mb-3 ml-1 block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--app-text-soft)]">
+            Target Professional Role
+          </label>
+          <div className="flex flex-col gap-3 md:flex-row">
+            <div className="relative flex-1">
+              <Target className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[var(--app-text-soft)]" size={18} />
+              <input
+                type="text"
+                placeholder="e.g. Senior Frontend Architect, Product Manager..."
+                className="field-shell w-full rounded-2xl py-3.5 pl-12 pr-4 text-sm font-medium"
+                value={targetRole}
+                onChange={(event) => setTargetRole(event.target.value)}
+              />
             </div>
-         </div>
+            <button
+              onClick={handleGenerate}
+              disabled={generating || !targetRole}
+              className="button-primary inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-3.5 text-sm font-semibold disabled:opacity-50"
+            >
+              {generating ? <Loader2 size={18} className="animate-spin" aria-hidden="true" /> : <Zap size={18} aria-hidden="true" />}
+              {generating ? "Generating..." : "Build Path"}
+            </button>
+          </div>
+        </div>
       </section>
 
-      {/* Roadmap Content */}
       <AnimatePresence>
-        {generating && (
-            <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                className="py-20 text-center bg-white rounded-[3rem] border border-[#141414]/5"
-            >
-                <div className="w-16 h-16 bg-[#F5F5F0] rounded-2xl flex items-center justify-center mx-auto mb-6">
-                    <Sparkles size={32} className="text-[#F27D26] animate-pulse" />
-                </div>
-                <h3 className="text-2xl font-bold mb-2">Analyzing skill gaps and industry trends...</h3>
-                <p className="text-[#141414]/40 text-sm">Our AI is drafting your personalized transformation plan.</p>
-            </motion.div>
-        )}
+        {generating ? (
+          <motion.section
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="section-shell rounded-[2rem] py-16 text-center"
+          >
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[rgba(70,102,255,0.08)] text-[var(--app-accent)]">
+              <Sparkles size={30} className="animate-pulse" aria-hidden="true" />
+            </div>
+            <h3 className="text-2xl font-semibold">Analyzing your skill trajectory...</h3>
+            <p className="mt-2 text-sm text-[var(--app-text-soft)]">
+              Building a personalized progression plan.
+            </p>
+          </motion.section>
+        ) : null}
 
-        {roadmap && !generating && (
-            <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="space-y-12"
-            >
-                <div className="bg-[#141414] text-[#F5F5F0] p-10 rounded-[3rem] flex flex-col md:flex-row justify-between items-center gap-8">
+        {roadmap && !generating ? (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-6"
+          >
+            <section className="gradient-surface rounded-[2rem] p-6 md:p-7">
+              <div className="eyebrow mb-2 text-[var(--app-accent)]">Roadmap Summary</div>
+              <h2 className="text-3xl font-semibold tracking-tight">Path to {targetRole}</h2>
+              <p className="mt-3 text-sm leading-7 text-[var(--app-text-muted)]">
+                Estimated duration: <span className="font-semibold text-[var(--app-accent)]">{roadmap.totalEstimatedTime}</span>
+              </p>
+            </section>
+
+            <section className="space-y-4">
+              {roadmap.steps?.map((step: any, index: number) => (
+                <motion.div
+                  key={`${step.milestone}-${index}`}
+                  initial={{ opacity: 0, x: -8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.06 }}
+                  className="list-row rounded-[2rem] p-6"
+                >
+                  <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                     <div>
-                        <div className="text-[10px] uppercase font-bold tracking-[0.2em] opacity-40 mb-3">Roadmap Summary</div>
-                        <h2 className="text-4xl font-bold tracking-tight">Path to {targetRole}</h2>
-                        <p className="text-[#F5F5F0]/60 mt-2">Total estimated duration: <span className="text-[#F27D26] font-bold">{roadmap.totalEstimatedTime}</span></p>
+                      <div className="mono text-[11px] uppercase tracking-[0.2em] text-[var(--app-accent)]">
+                        Step {index + 1}
+                      </div>
+                      <h3 className="mt-1 text-xl font-semibold">{step.milestone}</h3>
                     </div>
-                </div>
+                    <div className="status-chip inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em]">
+                      <Calendar size={12} aria-hidden="true" />
+                      {step.duration}
+                    </div>
+                  </div>
 
-                <div className="relative pl-8 md:pl-12 space-y-12 before:absolute before:left-0 before:top-2 before:bottom-2 before:w-[2px] before:bg-gradient-to-b before:from-[#F27D26] before:to-transparent">
-                    {roadmap.steps?.map((step: any, i: number) => (
-                        <motion.div 
-                            key={i}
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: i * 0.1 }}
-                            className="relative"
+                  <p className="text-sm leading-8 text-[var(--app-text-muted)]">{step.description}</p>
+
+                  <div className="mt-5">
+                    <div className="mb-2 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--app-text-soft)]">
+                      <ListChecks size={14} aria-hidden="true" />
+                      Skills to Master
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {step.skillsToLearn?.map((skill: string, skillIndex: number) => (
+                        <span
+                          key={`${skill}-${skillIndex}`}
+                          className="status-chip rounded-full px-3 py-1 text-xs font-semibold"
                         >
-                            {/* Dot */}
-                            <div className="absolute -left-[33px] md:-left-[49px] top-1 w-4 h-4 rounded-full border-4 border-[#F5F5F0] bg-[#F27D26] shadow-md shadow-[#F27D26]/20"></div>
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </section>
 
-                            <div className="bg-white p-8 rounded-[2rem] border border-[#141414]/5 hover:border-[#141414]/10 transition-colors shadow-sm">
-                                <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
-                                    <div>
-                                        <div className="text-[10px] uppercase font-bold tracking-widest text-[#F27D26] mb-1">Step {i + 1}</div>
-                                        <h3 className="text-xl font-bold">{step.milestone}</h3>
-                                    </div>
-                                    <div className="flex items-center gap-2 px-3 py-1.5 bg-[#F5F5F0] rounded-xl text-[10px] font-bold uppercase tracking-tight">
-                                        <Calendar size={12} className="text-[#141414]/40" />
-                                        {step.duration}
-                                    </div>
-                                </div>
-                                
-                                <p className="text-sm text-[#141414]/60 mb-6 leading-relaxed">{step.description}</p>
-                                
-                                <div className="space-y-4">
-                                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#141414]/40">
-                                        <ListChecks size={14} /> Skills to Master
-                                    </div>
-                                    <div className="flex flex-wrap gap-2">
-                                        {step.skillsToLearn?.map((skill: string, j: number) => (
-                                            <span key={j} className="px-3 py-1 bg-[#141414]/5 text-[#141414] rounded-lg text-xs font-bold hover:bg-[#F27D26] hover:text-[#141414] transition-all cursor-default">
-                                                {skill}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        </motion.div>
-                    ))}
-                </div>
-
-                <div className="bg-white border border-[#141414]/5 p-12 rounded-[3rem] text-center">
-                    <h4 className="text-xl font-bold mb-4">Start your journey today</h4>
-                    <p className="text-[#141414]/60 text-sm mb-8 max-w-lg mx-auto leading-relaxed">Consistency is key. Focus on one milestone at a time and update your progress to see the roadmap evolve.</p>
-                    <button className="px-10 py-4 bg-[#141414] text-[#F5F5F0] rounded-2xl font-bold hover:scale-105 transition-transform flex items-center gap-2 mx-auto">
-                        Track Progress <ArrowRight size={20} />
-                    </button>
-                </div>
-            </motion.div>
-        )}
+            <section className="section-shell rounded-[2rem] p-8 text-center">
+              <h4 className="text-xl font-semibold">Start this week</h4>
+              <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-[var(--app-text-muted)]">
+                Consistency compounds. Pick the first milestone, execute weekly, and revisit this roadmap as your profile evolves.
+              </p>
+              <button className="button-primary mx-auto mt-6 inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold">
+                Track Progress <ArrowRight size={16} aria-hidden="true" />
+              </button>
+            </section>
+          </motion.div>
+        ) : null}
       </AnimatePresence>
     </div>
   );

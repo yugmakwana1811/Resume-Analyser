@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { User } from "../App";
-import { LogOut, Zap } from "lucide-react";
+import { ArrowRight, LayoutGrid, LogOut, Zap } from "lucide-react";
 
 interface NavbarProps {
   user: User;
@@ -16,47 +16,59 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
   };
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-[rgba(41,49,81,0.08)] bg-[rgba(252,252,253,0.76)] backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-        <Link to="/" className="flex items-center gap-2 group">
-          <div className="brand-mark flex h-10 w-10 items-center justify-center rounded-2xl transition-transform group-hover:rotate-6">
-            <Zap size={18} className="text-white" />
+    <nav className="sticky top-0 z-50 px-4 pt-4 md:px-6">
+      <div className="page-frame topbar-glass flex items-center justify-between rounded-[1.75rem] px-4 py-3 md:px-5">
+        <Link to="/" className="group flex min-w-0 items-center gap-3">
+          <div className="brand-mark transition-premium flex h-11 w-11 items-center justify-center rounded-2xl group-hover:-translate-y-0.5 group-hover:rotate-3">
+            <Zap size={18} className="text-white" aria-hidden="true" />
           </div>
-          <div>
+          <div className="min-w-0">
             <div className="font-sans text-lg font-semibold tracking-tight text-[var(--app-text)]">ApplyIQ</div>
-            <div className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[var(--app-text-soft)]">
-              Premium Career Intelligence
+            <div className="truncate text-[10px] font-semibold uppercase tracking-[0.24em] text-[var(--app-text-soft)]">
+              Career Intelligence Platform
             </div>
           </div>
         </Link>
 
-        <div className="hidden items-center gap-8 text-sm font-medium text-[var(--app-text-muted)] md:flex">
-          <Link to="/" className="transition-colors hover:text-[var(--app-text)]">Home</Link>
+        <div className="hidden items-center gap-2 md:flex">
+          <Link
+            to="/"
+            className="button-ghost rounded-full px-4 py-2 text-sm font-semibold"
+          >
+            Home
+          </Link>
           {user && (
-            <Link to="/dashboard" className="transition-colors hover:text-[var(--app-text)]">Dashboard</Link>
+            <Link
+              to="/dashboard"
+              className="button-ghost inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold"
+            >
+              <LayoutGrid size={16} aria-hidden="true" />
+              Dashboard
+            </Link>
           )}
         </div>
 
         <div className="flex items-center gap-4">
           {user ? (
             <div className="flex items-center gap-4">
-              <span className="hidden rounded-full border border-[rgba(41,49,81,0.08)] bg-white/70 px-3 py-1.5 text-xs text-[var(--app-text-muted)] shadow-sm sm:block">
+              <span className="status-chip hidden rounded-full px-3 py-1.5 text-xs sm:block">
                 {user.email}
               </span>
               <button 
                 onClick={handleLogout}
-                className="rounded-full border border-[rgba(41,49,81,0.08)] bg-white/72 p-2.5 text-[var(--app-text-muted)] shadow-sm transition-all hover:border-[rgba(93,107,255,0.12)] hover:text-[var(--app-text)]"
-                title="Logout"
+                className="button-secondary rounded-full p-2.5 text-[var(--app-text-muted)]"
+                title="Log Out"
+                aria-label="Log Out"
               >
-                <LogOut size={18} />
+                <LogOut size={18} aria-hidden="true" />
               </button>
             </div>
           ) : (
             <Link 
               to="/auth" 
-              className="button-primary rounded-full px-5 py-2.5 text-sm font-semibold transition-all"
+              className="button-primary inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold"
             >
-              Get Started
+              Get Started <ArrowRight size={16} aria-hidden="true" />
             </Link>
           )}
         </div>

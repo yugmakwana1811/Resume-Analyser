@@ -45,7 +45,16 @@ export default function CompanyProfile() {
               <div className="flex flex-wrap items-center justify-center gap-4 text-sm font-medium text-[var(--app-text-muted)] md:justify-start">
                 {company.industry && <div className="flex items-center gap-1"><Briefcase size={16} /> {company.industry}</div>}
                 {company.size && <div className="flex items-center gap-1"><Building size={16} /> {company.size} EMPLOYEES</div>}
-                {company.website && <a href={company.website} target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:text-[#F27D26]"><Globe size={16} /> Website</a>}
+                {company.website && (
+                  <a
+                    href={company.website}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-1 transition-colors hover:text-[var(--app-accent)]"
+                  >
+                    <Globe size={16} /> Website
+                  </a>
+                )}
               </div>
             </div>
           </div>

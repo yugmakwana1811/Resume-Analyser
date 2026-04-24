@@ -118,11 +118,11 @@ export default function SeekerTracker({ user }: { user: User }) {
   };
 
   return (
-    <div className="space-y-8 pb-20">
-      <header>
+    <div className="space-y-6 pb-20">
+      <header className="page-hero overflow-hidden px-6 py-7 md:px-8 md:py-9">
         <div className="eyebrow mb-2">Application Timeline</div>
-        <h1 className="mb-2 text-4xl font-semibold tracking-[-0.04em]">My Applications</h1>
-        <p className="text-[var(--app-text-muted)]">
+        <h1 className="text-balance text-4xl font-semibold tracking-[-0.05em] md:text-5xl">Track every application without losing the story behind it.</h1>
+        <p className="mt-4 max-w-2xl text-base leading-8 text-[var(--app-text-muted)]">
           Track every submission and review the full history of status changes for each role.
         </p>
       </header>
@@ -143,7 +143,7 @@ export default function SeekerTracker({ user }: { user: User }) {
                 key={application.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="panel-surface rounded-2xl transition-colors"
+                className="list-row rounded-2xl"
               >
                 <div className="flex flex-col gap-6 p-6 lg:flex-row lg:items-center lg:justify-between">
                   <div className="flex items-center gap-6">
@@ -173,7 +173,7 @@ export default function SeekerTracker({ user }: { user: User }) {
                     </div>
                     <button
                       onClick={() => startInterview(application)}
-                      className="flex items-center gap-1.5 rounded-xl bg-blue-50 px-3 py-2 text-xs font-bold uppercase tracking-widest text-blue-600 transition-colors hover:bg-blue-100"
+                      className="transition-premium flex items-center gap-1.5 rounded-xl bg-[rgba(70,102,255,0.08)] px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--app-accent)] hover:bg-[rgba(70,102,255,0.14)]"
                     >
                       <MessageSquare size={14} /> Mock Interview
                     </button>
@@ -183,7 +183,7 @@ export default function SeekerTracker({ user }: { user: User }) {
                           current === application.id ? null : application.id,
                         )
                       }
-                      className="button-secondary flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold uppercase tracking-widest transition-all"
+                      className="button-secondary flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold uppercase tracking-widest"
                     >
                       <History size={14} />
                       View History
@@ -210,7 +210,7 @@ export default function SeekerTracker({ user }: { user: User }) {
                                 {getStatusIcon(entry.status)}
                               </div>
                               {index !== application.statusHistory.length - 1 && (
-                                <div className="mt-2 h-full w-px bg-[#141414]/10" />
+                                <div className="mt-2 h-full w-px bg-[rgba(25,36,71,0.1)]" />
                               )}
                             </div>
                             <div className="pb-4">
@@ -235,7 +235,7 @@ export default function SeekerTracker({ user }: { user: User }) {
           })}
         </div>
       ) : (
-        <div className="panel-surface rounded-[3rem] py-24 text-center">
+        <div className="section-shell rounded-[3rem] py-24 text-center">
           <ClipboardList size={48} className="mx-auto mb-6 text-[var(--app-text-soft)]" />
           <h3 className="mb-2 text-xl font-bold">No applications yet</h3>
           <p className="mx-auto max-w-sm text-[var(--app-text-soft)]">
@@ -275,7 +275,7 @@ export default function SeekerTracker({ user }: { user: User }) {
             className="fixed inset-0 z-[60] flex items-center justify-center p-6"
           >
             <div
-              className="absolute inset-0 bg-[#141414]/40 backdrop-blur-sm"
+              className="absolute inset-0 bg-[rgba(20,24,40,0.28)] backdrop-blur-sm"
               onClick={() => setInterviewApp(null)}
             />
             <motion.div
@@ -313,7 +313,7 @@ export default function SeekerTracker({ user }: { user: User }) {
                     <div
                       className={`mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
                         message.role === "user"
-                          ? "bg-[#141414] text-white"
+                          ? "bg-[var(--app-text)] text-white"
                           : "bg-[rgba(93,107,255,0.12)] text-[var(--app-accent)]"
                       }`}
                     >

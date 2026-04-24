@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { User } from "../../App";
 import { motion } from "motion/react";
-import { ArrowRight, BarChart3, Briefcase, CheckCircle, Eye, Users } from "lucide-react";
+import { ArrowRight, Briefcase, CheckCircle2, Eye, TrendingUp, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 
 type OverviewResponse = {
@@ -48,8 +48,7 @@ export default function RecruiterOverview({ user }: { user: User }) {
       setLoading(true);
       try {
         const response = await fetch(`/api/recruiters/${user.recruiterId}/overview`);
-        const data = await response.json();
-        setOverview(data);
+        setOverview(await response.json());
       } catch (error) {
         console.error(error);
       } finally {
@@ -62,11 +61,11 @@ export default function RecruiterOverview({ user }: { user: User }) {
 
   if (loading) {
     return (
-      <div className="space-y-8">
-        <div className="panel-surface h-32 animate-pulse rounded-3xl" />
-        <div className="grid gap-6 md:grid-cols-4">
+      <div className="space-y-6 pb-20">
+        <div className="page-hero h-56 animate-pulse" />
+        <div className="grid gap-5 md:grid-cols-4">
           {[1, 2, 3, 4].map((item) => (
-            <div key={item} className="panel-surface h-24 animate-pulse rounded-2xl" />
+            <div key={item} className="section-shell h-32 animate-pulse rounded-[2rem]" />
           ))}
         </div>
       </div>
@@ -76,186 +75,173 @@ export default function RecruiterOverview({ user }: { user: User }) {
   const maxPipelineCount = Math.max(...overview.pipeline.map((item) => item.count), 1);
 
   return (
-    <div className="space-y-8 pb-20">
-      <header>
-        <div className="eyebrow mb-2">Recruiter Workspace</div>
-        <h1 className="mb-2 text-4xl font-semibold tracking-[-0.04em]">Hiring Dashboard</h1>
-        <p className="text-[var(--app-text-muted)]">
-          Watch role performance, track applicants, and act on the latest candidate activity.
-        </p>
-      </header>
-
-      <div className="grid gap-6 md:grid-cols-4">
-        <StatCard
-          label="Active Jobs"
-          value={overview.stats.activeJobs}
-          icon={<Briefcase size={20} className="text-blue-500" />}
-          color="bg-blue-50"
-        />
-        <StatCard
-          label="Applicants"
-          value={overview.stats.totalApplicants}
-          icon={<Users size={20} className="text-emerald-500" />}
-          color="bg-emerald-50"
-        />
-        <StatCard
-          label="Shortlisted"
-          value={overview.stats.shortlisted}
-          icon={<CheckCircle size={20} className="text-green-500" />}
-          color="bg-green-50"
-        />
-        <StatCard
-          label="Views"
-          value={overview.stats.totalViews}
-          icon={<Eye size={20} className="text-orange-500" />}
-          color="bg-orange-50"
-        />
-      </div>
-
-      <div className="grid gap-8 lg:grid-cols-3">
-        <div className="space-y-8 lg:col-span-2">
-          <section>
-            <div className="mb-6 flex items-center justify-between">
-              <h2 className="text-xl font-bold tracking-tight">Recent Activity</h2>
-              <Link
-                to="/dashboard/candidates"
-                className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--app-text-soft)] transition-colors hover:text-[var(--app-text)]"
-              >
-                Review Applicants
-              </Link>
-            </div>
-
-            <div className="panel-surface divide-y divide-[rgba(41,49,81,0.08)] rounded-3xl">
-              {overview.recentActivity.length > 0 ? (
-                overview.recentActivity.map((activity) => (
-                  <div
-                    key={activity.id}
-                    className="flex items-center justify-between gap-4 p-6 transition-colors hover:bg-white/60"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(93,107,255,0.08)] text-xs font-semibold uppercase text-[var(--app-text-muted)]">
-                        {activity.candidateName.slice(0, 2)}
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-semibold">
-                          {activity.candidateName} applied for {activity.jobTitle}
-                        </h4>
-                        <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--app-text-soft)]">
-                          {new Date(activity.appliedAt).toLocaleDateString()} at {activity.company}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="text-right">
-                      <div className="text-sm font-semibold text-[var(--app-accent)]">
-                        {activity.matchScore !== null ? `${activity.matchScore}% Fit` : activity.status}
-                      </div>
-                      <div className="text-[8px] uppercase tracking-[0.18em] text-[var(--app-text-soft)]">
-                        {activity.matchScore !== null ? "AI Score" : "Status"}
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="p-8 text-center text-sm text-[var(--app-text-soft)]">
-                  New candidate activity will appear here as applications come in.
-                </div>
-              )}
-            </div>
-          </section>
-
-          <section className="gradient-surface relative overflow-hidden rounded-[3rem] p-10">
-            <div className="relative z-10">
-              <div className="eyebrow mb-3 text-[var(--app-accent)]">Backend-backed insights</div>
-              <h3 className="mb-4 text-2xl font-semibold">Analytics at a glance</h3>
-              <p className="mb-6 max-w-sm text-sm leading-relaxed text-[var(--app-text-muted)]">
-                Listing views and applicant volume now update directly from the backend, so your recruiter dashboard reflects real activity instead of placeholders.
-              </p>
+    <div className="space-y-6 pb-20">
+      <header className="page-hero overflow-hidden px-6 py-7 md:px-8 md:py-9">
+        <div className="grid gap-8 lg:grid-cols-[1.06fr_0.94fr] lg:items-end">
+          <div>
+            <div className="eyebrow">Recruiter Overview</div>
+            <h1 className="mt-3 text-balance text-4xl font-semibold tracking-[-0.05em] text-[var(--app-text)] md:text-5xl">
+              Run hiring with clearer signal and less operational drag.
+            </h1>
+            <p className="mt-4 max-w-2xl text-base leading-8 text-[var(--app-text-muted)]">
+              See what is performing, which candidates are moving, and where recruiter attention should go next without parsing a wall of dashboard cards.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 to="/dashboard/jobs"
-                className="button-primary inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold transition-all"
+                className="button-primary inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold"
               >
-                Open Listings <ArrowRight size={18} />
+                Open Listings <ArrowRight size={16} aria-hidden="true" />
+              </Link>
+              <Link
+                to="/dashboard/candidates"
+                className="button-secondary inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold"
+              >
+                Review Candidates
               </Link>
             </div>
-            <div className="absolute bottom-[-20%] right-[-10%] h-64 w-64 rounded-full bg-[rgba(163,140,247,0.16)] blur-3xl" />
-          </section>
-        </div>
+          </div>
 
-        <div className="lg:col-span-1">
-          <section className="panel-surface h-full rounded-[3rem] p-8">
-            <div className="mb-8 flex items-center gap-2">
-              <BarChart3 size={18} className="text-[var(--app-text-soft)]" />
-              <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--app-text-soft)]">
-                Hiring Pipeline
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <RecruiterMetric
+              label="Active Jobs"
+              value={overview.stats.activeJobs}
+              icon={<Briefcase size={16} aria-hidden="true" />}
+            />
+            <RecruiterMetric
+              label="Applicants"
+              value={overview.stats.totalApplicants}
+              icon={<Users size={16} aria-hidden="true" />}
+            />
+            <RecruiterMetric
+              label="Shortlisted"
+              value={overview.stats.shortlisted}
+              icon={<CheckCircle2 size={16} aria-hidden="true" />}
+            />
+            <RecruiterMetric
+              label="Views"
+              value={overview.stats.totalViews}
+              icon={<Eye size={16} aria-hidden="true" />}
+            />
+          </div>
+        </div>
+      </header>
+
+      <div className="grid gap-5 xl:grid-cols-[1.08fr_0.92fr]">
+        <section className="section-shell rounded-[2rem] p-6 md:p-7">
+          <div className="mb-6 flex items-center justify-between gap-4">
+            <div>
+              <div className="eyebrow">Recent Activity</div>
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[var(--app-text)]">
+                Candidate movement you should review
               </h2>
             </div>
-            <div className="space-y-8">
-              {overview.pipeline.length > 0 ? (
-                overview.pipeline.map((stage) => (
-                  <PipelineStage
-                    key={stage.label}
-                    label={stage.label}
-                    count={stage.count}
-                    percentage={Math.round((stage.count / maxPipelineCount) * 100)}
-                  />
-                ))
-              ) : (
-                <p className="text-sm text-[var(--app-text-soft)]">
-                  Pipeline data will appear after your first application arrives.
-                </p>
-              )}
-            </div>
-          </section>
-        </div>
+            <Link
+              to="/dashboard/candidates"
+              className="button-ghost rounded-full px-4 py-2 text-sm font-semibold"
+            >
+              See All
+            </Link>
+          </div>
+
+          <div className="space-y-3">
+            {overview.recentActivity.length > 0 ? (
+              overview.recentActivity.map((activity) => (
+                <div key={activity.id} className="list-row flex items-center justify-between gap-4 p-4">
+                  <div className="flex min-w-0 items-center gap-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[1rem] bg-[rgba(70,102,255,0.08)] text-sm font-semibold text-[var(--app-text-soft)]">
+                      {activity.candidateName.slice(0, 2)}
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="truncate text-sm font-semibold text-[var(--app-text)]">
+                        {activity.candidateName}
+                      </h3>
+                      <p className="truncate text-sm text-[var(--app-text-muted)]">
+                        {activity.jobTitle} • {activity.company}
+                      </p>
+                      <p className="mono mt-1 text-[11px] text-[var(--app-text-soft)]">
+                        {new Date(activity.appliedAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="text-right">
+                    <div className="text-sm font-semibold text-[var(--app-accent)]">
+                      {activity.matchScore !== null ? `${activity.matchScore}% Fit` : activity.status}
+                    </div>
+                    <div className="mono text-[11px] uppercase tracking-[0.18em] text-[var(--app-text-soft)]">
+                      {activity.matchScore !== null ? "AI Score" : "Status"}
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="list-row p-6 text-sm leading-7 text-[var(--app-text-muted)]">
+                Candidate activity will appear here as soon as new applications start moving through the pipeline.
+              </div>
+            )}
+          </div>
+        </section>
+
+        <section className="section-shell rounded-[2rem] p-6 md:p-7">
+          <div className="mb-6 flex items-center gap-2">
+            <TrendingUp size={16} className="text-[var(--app-accent)]" aria-hidden="true" />
+            <div className="eyebrow">Hiring Pipeline</div>
+          </div>
+
+          <div className="space-y-5">
+            {overview.pipeline.length > 0 ? (
+              overview.pipeline.map((stage) => (
+                <div key={stage.label} className="list-row p-4">
+                  <div className="mb-3 flex items-center justify-between">
+                    <span className="text-sm font-semibold text-[var(--app-text)]">{stage.label}</span>
+                    <span className="mono text-xs text-[var(--app-text-soft)]">{stage.count}</span>
+                  </div>
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-[rgba(70,102,255,0.08)]">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${Math.round((stage.count / maxPipelineCount) * 100)}%` }}
+                      transition={{ duration: 0.7 }}
+                      className="h-full bg-[linear-gradient(135deg,var(--app-accent),var(--app-secondary))]"
+                    />
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="list-row p-6 text-sm leading-7 text-[var(--app-text-muted)]">
+                Pipeline data will populate once candidates begin applying to your live roles.
+              </div>
+            )}
+          </div>
+
+          <div className="mt-6 rounded-[1.5rem] border border-[rgba(70,102,255,0.08)] bg-[rgba(70,102,255,0.04)] p-4">
+            <div className="text-sm font-semibold text-[var(--app-accent)]">Backend-backed analytics</div>
+            <p className="mt-2 text-sm leading-7 text-[var(--app-text-muted)]">
+              Listing views and applicant counts are now surfaced from the backend so recruiter reporting stays tied to actual product activity.
+            </p>
+          </div>
+        </section>
       </div>
     </div>
   );
 }
 
-function StatCard({
+function RecruiterMetric({
   label,
   value,
   icon,
-  color,
 }: {
   label: string;
   value: number;
   icon: React.ReactNode;
-  color: string;
 }) {
   return (
-    <div className="panel-surface flex flex-col items-center rounded-[2.5rem] p-8 text-center">
-      <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-2xl ${color}`}>{icon}</div>
-      <div className="mb-1 text-4xl font-semibold">{value}</div>
-      <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--app-text-soft)]">{label}</div>
-    </div>
-  );
-}
-
-function PipelineStage({
-  label,
-  count,
-  percentage,
-}: {
-  label: string;
-  count: number;
-  percentage: number;
-}) {
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest">
-        <span className="text-[var(--app-text-muted)]">{label}</span>
-        <span>{count}</span>
+    <div className="workspace-stat p-4">
+      <div className="flex items-center gap-2 text-[var(--app-text-soft)]">
+        {icon}
+        <span className="mono text-[11px] uppercase tracking-[0.2em]">{label}</span>
       </div>
-      <div className="h-2 w-full overflow-hidden rounded-full bg-[rgba(93,107,255,0.08)]">
-        <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: `${percentage}%` }}
-          transition={{ duration: 0.8 }}
-          className="h-full bg-[linear-gradient(135deg,var(--app-accent),var(--app-secondary))]"
-        />
-      </div>
+      <div className="mt-4 text-3xl font-semibold tracking-tight text-[var(--app-text)]">{value}</div>
     </div>
   );
 }

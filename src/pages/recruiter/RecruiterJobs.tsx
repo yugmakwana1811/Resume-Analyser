@@ -143,21 +143,23 @@ export default function RecruiterJobs({ user }: { user: User }) {
   });
 
   return (
-    <div className="space-y-8 pb-20">
-      <header className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+    <div className="space-y-6 pb-20">
+      <header className="page-hero overflow-hidden px-6 py-7 md:px-8 md:py-9">
+        <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
         <div>
           <div className="eyebrow mb-2">Recruiter Listings</div>
-          <h1 className="mb-2 text-4xl font-semibold tracking-[-0.04em]">My Listings</h1>
-          <p className="text-[var(--app-text-muted)]">
-            Manage active roles and keep an eye on views and applicant volume.
+          <h1 className="text-balance text-4xl font-semibold tracking-[-0.05em] md:text-5xl">Manage Roles with Cleaner Analytics</h1>
+          <p className="mt-4 max-w-2xl text-base leading-8 text-[var(--app-text-muted)]">
+            Review listing performance, applicant volume, and posting quality from one higher-trust recruiter surface.
           </p>
         </div>
         <button
           onClick={() => setShowForm(true)}
-          className="button-primary flex items-center gap-2 rounded-xl px-6 py-3 font-semibold transition-all"
+          className="button-primary flex items-center gap-2 rounded-xl px-6 py-3 font-semibold"
         >
-          <Plus size={20} /> Create Listing
+          <Plus size={20} aria-hidden="true" /> Create Listing
         </button>
+        </div>
       </header>
 
       {loading ? (
@@ -174,23 +176,23 @@ export default function RecruiterJobs({ user }: { user: User }) {
             return (
               <div
                 key={job.id}
-                className="panel-surface group flex flex-col gap-6 rounded-3xl p-6 lg:flex-row lg:items-center lg:justify-between"
+                className="list-row transition-premium group flex flex-col gap-6 rounded-3xl p-6 lg:flex-row lg:items-center lg:justify-between"
               >
                 <div className="flex items-start gap-6">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[rgba(93,107,255,0.08)] text-xl font-semibold text-[var(--app-text-soft)]">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[rgba(70,102,255,0.08)] text-xl font-semibold text-[var(--app-text-soft)]">
                     {job.title[0]}
                   </div>
                   <div>
                     <h3 className="mb-2 text-lg font-semibold">{job.title}</h3>
                     <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-[var(--app-text-muted)]">
-                      <span className="rounded-md bg-blue-50 px-2 py-0.5 font-bold text-blue-600">
+                      <span className="rounded-full bg-[rgba(70,102,255,0.08)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--app-accent)]">
                         {job.category}
                       </span>
                       <div className="flex items-center gap-1.5">
-                        <MapPin size={12} /> {job.location || "Remote"}
+                        <MapPin size={12} aria-hidden="true" /> {job.location || "Remote"}
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <DollarSign size={12} /> {job.salary || "Compensation not set"}
+                        <DollarSign size={12} aria-hidden="true" /> {job.salary || "Compensation not set"}
                       </div>
                       {job.workMode && <span>{job.workMode.replaceAll("_", " ")}</span>}
                     </div>
@@ -207,10 +209,11 @@ export default function RecruiterJobs({ user }: { user: User }) {
                   <button
                     onClick={() => handleDelete(job.id)}
                     disabled={deletingId === job.id}
-                    className="rounded-xl p-3 text-[#141414]/20 transition-colors hover:bg-red-50 hover:text-red-500 disabled:opacity-50"
-                    title="Delete job"
+                    className="button-ghost rounded-xl p-3 text-[var(--app-text-soft)] hover:bg-red-50 hover:text-[var(--app-danger)] disabled:opacity-50"
+                    title="Delete Job"
+                    aria-label="Delete Job"
                   >
-                    {deletingId === job.id ? <Loader2 size={20} className="animate-spin" /> : <Trash2 size={20} />}
+                    {deletingId === job.id ? <Loader2 size={20} className="animate-spin" /> : <Trash2 size={20} aria-hidden="true" />}
                   </button>
                 </div>
               </div>
@@ -218,8 +221,8 @@ export default function RecruiterJobs({ user }: { user: User }) {
           })}
         </div>
       ) : (
-        <div className="panel-surface rounded-[3rem] py-24 text-center">
-          <Briefcase size={48} className="mx-auto mb-6 text-[var(--app-text-soft)]" />
+        <div className="section-shell rounded-[3rem] py-24 text-center">
+          <Briefcase size={48} className="mx-auto mb-6 text-[var(--app-text-soft)]" aria-hidden="true" />
           <h3 className="mb-2 text-xl font-bold">No active listings</h3>
           <p className="mx-auto max-w-sm text-[var(--app-text-soft)]">
             Create your first job posting to start tracking engagement and incoming applicants.
@@ -236,7 +239,7 @@ export default function RecruiterJobs({ user }: { user: User }) {
             className="fixed inset-0 z-[60] flex items-center justify-center p-6"
           >
             <div
-              className="absolute inset-0 bg-[#141414]/40 backdrop-blur-sm"
+              className="absolute inset-0 bg-[rgba(20,24,40,0.28)] backdrop-blur-sm"
               onClick={() => !submitting && setShowForm(false)}
             />
             <motion.div
@@ -247,14 +250,15 @@ export default function RecruiterJobs({ user }: { user: User }) {
             >
               <div className="gradient-surface flex items-center justify-between p-8">
                 <div>
-                  <div className="eyebrow mb-2 text-[var(--app-accent)]">Recruiter Action</div>
+                  <div className="eyebrow mb-2 text-[var(--app-accent)]">Create a Listing</div>
                   <h2 className="text-2xl font-semibold tracking-tight">Post New Role</h2>
                 </div>
                 <button
                   onClick={() => setShowForm(false)}
-                  className="rounded-full p-2 transition-colors hover:bg-white/70"
+                  aria-label="Close Listing Form"
+                  className="button-secondary rounded-full p-2"
                 >
-                  <X size={24} />
+                  <X size={24} aria-hidden="true" />
                 </button>
               </div>
 
@@ -350,21 +354,21 @@ export default function RecruiterJobs({ user }: { user: User }) {
 
                 <div>
                   <div className="mb-2 flex items-end justify-between">
-                    <label className="ml-1 block text-xs font-bold uppercase tracking-widest text-[#141414]/40">
+                    <label className="ml-1 block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--app-text-soft)]">
                       Job Description
                     </label>
                     <button
                       type="button"
                       onClick={handleGenerateDescription}
-                      className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-[#F27D26] hover:underline"
+                      className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--app-accent)] hover:underline"
                     >
-                      <Wand2 size={12} /> Auto-Write with AI
+                      <Wand2 size={12} aria-hidden="true" /> Auto-Write with AI
                     </button>
                   </div>
                   <textarea
                     rows={5}
-                    placeholder="Detail the responsibilities, impact, and daily tasks..."
-                    className="field-shell w-full resize-none rounded-xl px-4 py-3 font-medium transition-all"
+                    placeholder="Detail the responsibilities, impact, and daily tasks…"
+                    className="field-shell w-full resize-none rounded-xl px-4 py-3 font-medium"
                     value={formData.description}
                     onChange={(event) => setFormData({ ...formData, description: event.target.value })}
                     required
@@ -372,13 +376,13 @@ export default function RecruiterJobs({ user }: { user: User }) {
                 </div>
 
                 <div>
-                  <label className="ml-1 mb-2 block text-xs font-bold uppercase tracking-widest text-[#141414]/40">
+                  <label className="ml-1 mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--app-text-soft)]">
                     Requirements
                   </label>
                   <textarea
                     rows={3}
-                    placeholder="List must-have skills, qualifications, or keywords."
-                    className="field-shell w-full resize-none rounded-xl px-4 py-3 font-medium transition-all"
+                    placeholder="List must-have skills, qualifications, or keywords…"
+                    className="field-shell w-full resize-none rounded-xl px-4 py-3 font-medium"
                     value={formData.requirements}
                     onChange={(event) => setFormData({ ...formData, requirements: event.target.value })}
                   />
@@ -387,9 +391,9 @@ export default function RecruiterJobs({ user }: { user: User }) {
                 <div className="pt-4">
                   <button
                     disabled={submitting}
-                    className="button-primary flex w-full items-center justify-center gap-2 rounded-2xl py-5 text-lg font-semibold transition-all"
+                    className="button-primary flex w-full items-center justify-center gap-2 rounded-2xl py-5 text-lg font-semibold"
                   >
-                    {submitting ? <Loader2 size={24} className="animate-spin" /> : "Launch Listing"}
+                    {submitting ? <Loader2 size={24} className="animate-spin" aria-hidden="true" /> : "Launch Listing"}
                   </button>
                 </div>
               </form>
@@ -406,7 +410,7 @@ function AnalyticsCard({ label, value, icon }: { label: string; value: number; i
     <div className="panel-muted min-w-[96px] rounded-2xl px-4 py-3 text-center">
       <div className="mb-2 flex items-center justify-center gap-2 text-[var(--app-text-soft)]">{icon}</div>
       <div className="text-lg font-semibold text-[var(--app-text)]">{value}</div>
-      <div className="text-[10px] font-semibold uppercase tracking-widest text-[var(--app-text-soft)]">{label}</div>
+      <div className="mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--app-text-soft)]">{label}</div>
     </div>
   );
 }
@@ -426,13 +430,13 @@ function FormField({
 }) {
   return (
     <div>
-      <label className="ml-1 mb-2 block text-xs font-bold uppercase tracking-widest text-[#141414]/40">
+      <label className="ml-1 mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--app-text-soft)]">
         {label}
       </label>
       <input
         type="text"
-        placeholder={placeholder}
-        className="field-shell w-full rounded-xl px-4 py-3 font-medium transition-all"
+        placeholder={`${placeholder}${placeholder.endsWith("…") ? "" : "…"}`}
+        className="field-shell w-full rounded-xl px-4 py-3 font-medium"
         value={value}
         onChange={(event) => onChange(event.target.value)}
         required={required}
@@ -454,12 +458,12 @@ function SelectField({
 }) {
   return (
     <div>
-      <label className="ml-1 mb-2 block text-xs font-bold uppercase tracking-widest text-[#141414]/40">
+      <label className="ml-1 mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--app-text-soft)]">
         {label}
       </label>
       <div className="relative">
         <select
-          className="field-shell w-full appearance-none rounded-xl px-4 py-3 font-medium transition-all"
+          className="field-shell w-full appearance-none rounded-xl px-4 py-3 font-medium"
           value={value}
           onChange={(event) => onChange(event.target.value)}
         >
@@ -469,7 +473,7 @@ function SelectField({
             </option>
           ))}
         </select>
-        <BarChart3 size={14} className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#141414]/20" />
+        <BarChart3 size={14} className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[var(--app-text-soft)]" aria-hidden="true" />
       </div>
     </div>
   );

@@ -14,15 +14,14 @@ export default function SeekerSavedJobs({ user }: { user: User }) {
   const fetchSavedJobs = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/saved-jobs/${user?.id}`);
-      if (!res.ok) {
-        const error = await res.json().catch(() => ({}));
+      const response = await fetch(`/api/saved-jobs/${user?.id}`);
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
         throw new Error(error.error || "Unable to load saved jobs.");
       }
-      const data = await res.json();
-      setSavedJobs(data);
-    } catch (err) {
-      console.error(err);
+      setSavedJobs(await response.json());
+    } catch (error) {
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -30,73 +29,93 @@ export default function SeekerSavedJobs({ user }: { user: User }) {
 
   const handleToggleSave = async (jobId: string, savedJobId: string) => {
     try {
-      const res = await fetch("/api/saved-jobs", {
+      const response = await fetch("/api/saved-jobs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user?.id, jobId })
+        body: JSON.stringify({ userId: user?.id, jobId }),
       });
-      if (!res.ok) {
-        const error = await res.json().catch(() => ({}));
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
         throw new Error(error.error || "Unable to update saved jobs.");
       }
-      setSavedJobs(prev => prev.filter(sj => sj.id !== savedJobId));
-    } catch (err) { console.error(err); }
+      setSavedJobs((previous) => previous.filter((savedJob) => savedJob.id !== savedJobId));
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
-    <div className="space-y-8 pb-20">
-      <header>
-        <h1 className="text-4xl font-bold tracking-tight mb-2">Saved Jobs</h1>
-        <p className="text-[#141414]/60">Your bookmarked career opportunities.</p>
+    <div className="space-y-6 pb-20">
+      <header className="page-hero overflow-hidden px-6 py-7 md:px-8 md:py-9">
+        <div className="eyebrow mb-2">Saved Jobs</div>
+        <h1 className="text-balance text-4xl font-semibold tracking-[-0.05em] md:text-5xl">
+          Keep priority roles in one focused shortlist.
+        </h1>
+        <p className="mt-4 max-w-2xl text-base leading-8 text-[var(--app-text-muted)]">
+          Use saved jobs as your personal queue for deeper review and faster application decisions.
+        </p>
       </header>
 
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid gap-5 lg:grid-cols-2">
         {loading ? (
-            [1,2,3].map(i => <div key={i} className="h-40 bg-white rounded-3xl animate-pulse"></div>)
+          [1, 2, 3].map((item) => <div key={item} className="section-shell h-40 animate-pulse rounded-[2rem]" />)
         ) : savedJobs.length > 0 ? (
-            savedJobs.map(({ id: savedJobId, job }) => (
-                <div 
-                    key={savedJobId} 
-                    className="bg-white p-8 rounded-[2rem] border border-[#141414]/5 hover:shadow-xl hover:shadow-[#141414]/5 transition-all flex flex-col justify-between"
-                >
-                    <div>
-                        <div className="flex justify-between items-start mb-6">
-                            <div className="w-14 h-14 bg-[#F5F5F0] rounded-2xl flex items-center justify-center font-bold text-2xl text-[#141414]/20">
-                                {job.company[0]}
-                            </div>
-                            <div className="flex gap-2 items-center">
-                                <span className="px-3 py-1 bg-green-50 text-green-700 text-[10px] uppercase font-bold tracking-widest rounded-full">{job.type || 'Full Time'}</span>
-                                <button onClick={() => handleToggleSave(job.id, savedJobId)} className="text-[#F27D26] hover:text-red-500 transition-colors p-1" title="Remove from saved">
-                                    <BookmarkMinus size={20} />
-                                </button>
-                            </div>
-                        </div>
-                        <h3 className="text-xl font-bold mb-2">{job.title}</h3>
-                        <div className="flex items-center gap-4 text-sm text-[#141414]/40 mb-6 font-medium">
-                            <div className="flex items-center gap-1.5"><Briefcase size={14} /> {job.company}</div>
-                            <div className="flex items-center gap-1.5"><MapPin size={14} /> {job.location || 'Remote'}</div>
-                        </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between pt-6 border-t border-[#141414]/5">
-                        <div className="flex items-center gap-1.5 text-sm font-bold">
-                            <DollarSign size={14} className="text-green-600" /> {job.salary || '$80k - $120k'}
-                        </div>
-                        <Link 
-                            to={`/dashboard/jobs?id=${job.id}`}
-                            className="flex items-center gap-2 text-sm font-bold bg-[#141414] text-[#F5F5F0] px-5 py-2.5 rounded-xl hover:opacity-90 transition-opacity"
-                        >
-                            View Job <ArrowRight size={14} />
-                        </Link>
-                    </div>
+          savedJobs.map(({ id: savedJobId, job }) => (
+            <div
+              key={savedJobId}
+              className="list-row transition-premium flex flex-col justify-between rounded-[2rem] p-6 hover:-translate-y-0.5"
+            >
+              <div>
+                <div className="mb-5 flex items-start justify-between gap-3">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[rgba(70,102,255,0.08)] text-2xl font-semibold text-[var(--app-text-soft)]">
+                    {job.company[0]}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-full bg-[rgba(62,161,125,0.1)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--app-success)]">
+                      {job.type || "Full Time"}
+                    </span>
+                    <button
+                      onClick={() => handleToggleSave(job.id, savedJobId)}
+                      className="button-ghost rounded-full p-2 text-[var(--app-text-soft)] hover:text-[var(--app-danger)]"
+                      title="Remove Saved Job"
+                      aria-label="Remove Saved Job"
+                    >
+                      <BookmarkMinus size={18} aria-hidden="true" />
+                    </button>
+                  </div>
                 </div>
-            ))
-        ) : (
-            <div className="lg:col-span-2 py-20 bg-white rounded-[2rem] border border-[#141414]/5 text-center">
-                <BookmarkMinus size={48} className="mx-auto text-[#141414]/10 mb-4" />
-                <h3 className="text-xl font-bold mb-2">No saved jobs</h3>
-                <p className="text-[#141414]/40">Jobs you bookmark will appear here.</p>
+
+                <h3 className="text-xl font-semibold">{job.title}</h3>
+                <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-[var(--app-text-muted)]">
+                  <div className="flex items-center gap-1.5">
+                    <Briefcase size={14} aria-hidden="true" /> {job.company}
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <MapPin size={14} aria-hidden="true" /> {job.location || "Remote"}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 flex items-center justify-between border-t border-[rgba(25,36,71,0.08)] pt-5">
+                <div className="flex items-center gap-1.5 text-sm font-semibold">
+                  <DollarSign size={14} className="text-[var(--app-success)]" aria-hidden="true" />
+                  {job.salary || "$80k - $120k"}
+                </div>
+                <Link
+                  to={`/dashboard/jobs?id=${job.id}`}
+                  className="button-primary inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold"
+                >
+                  View Job <ArrowRight size={14} aria-hidden="true" />
+                </Link>
+              </div>
             </div>
+          ))
+        ) : (
+          <div className="section-shell lg:col-span-2 rounded-[2rem] py-20 text-center">
+            <BookmarkMinus size={46} className="mx-auto mb-4 text-[var(--app-text-soft)]" aria-hidden="true" />
+            <h3 className="mb-2 text-xl font-semibold">No saved jobs</h3>
+            <p className="text-[var(--app-text-soft)]">Jobs you bookmark will appear here.</p>
+          </div>
         )}
       </div>
     </div>

@@ -6,9 +6,9 @@ import { Link } from "react-router-dom";
 import { safeJsonParse } from "../../lib/utils";
 
 const statusStyles: Record<string, string> = {
-  PENDING: "bg-orange-50 text-orange-600 border-orange-100",
-  SHORTLISTED: "bg-green-50 text-green-600 border-green-100",
-  REJECTED: "bg-red-50 text-red-600 border-red-100",
+  PENDING: "bg-[rgba(217,139,50,0.1)] text-[var(--app-warning)] border-[rgba(217,139,50,0.2)]",
+  SHORTLISTED: "bg-[rgba(62,161,125,0.12)] text-[var(--app-success)] border-[rgba(62,161,125,0.2)]",
+  REJECTED: "bg-[rgba(211,96,102,0.12)] text-[var(--app-danger)] border-[rgba(211,96,102,0.2)]",
 };
 
 export default function RecruiterCandidates({ user }: { user: User }) {
@@ -81,31 +81,36 @@ export default function RecruiterCandidates({ user }: { user: User }) {
       );
     } catch (error: any) {
       console.error(error);
-      alert(error.message || "Unable to update the candidate status.");
+      alert(error.message || "Unable to update candidate status.");
     } finally {
       setUpdatingId(null);
     }
   };
 
   return (
-    <div className="space-y-8 pb-20">
-      <header className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-        <div>
-          <h1 className="mb-2 text-4xl font-bold tracking-tight">Talent Pool</h1>
-          <p className="text-[#141414]/60">
-            Review real applicants from your listings and move them through the pipeline.
-          </p>
-        </div>
-        <div className="flex min-w-[320px] gap-2 rounded-2xl border border-[#141414]/5 bg-white p-2 shadow-sm">
-          <div className="flex flex-1 items-center gap-2 pl-2">
-            <Search size={18} className="text-[#141414]/40" />
-            <input
-              type="text"
-              placeholder="Search by name, skill, or role"
-              className="w-full bg-transparent py-2 text-sm outline-none"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-            />
+    <div className="space-y-6 pb-20">
+      <header className="page-hero overflow-hidden px-6 py-7 md:px-8 md:py-9">
+        <div className="grid gap-6 xl:grid-cols-[1fr_auto] xl:items-end">
+          <div>
+            <div className="eyebrow mb-2">Talent Pool</div>
+            <h1 className="text-balance text-4xl font-semibold tracking-[-0.05em] md:text-5xl">
+              Review applicants with fast, high-signal actions.
+            </h1>
+            <p className="mt-4 max-w-2xl text-base leading-8 text-[var(--app-text-muted)]">
+              Search by candidate, role, or skill and move each applicant through the pipeline without leaving the workspace.
+            </p>
+          </div>
+          <div className="toolbar-shell min-w-[320px]">
+            <div className="flex flex-1 items-center gap-2 pl-2">
+              <Search size={18} className="text-[var(--app-text-soft)]" aria-hidden="true" />
+              <input
+                type="text"
+                placeholder="Search by name, skill, or role..."
+                className="w-full bg-transparent py-2 text-sm"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+              />
+            </div>
           </div>
         </div>
       </header>
@@ -113,7 +118,7 @@ export default function RecruiterCandidates({ user }: { user: User }) {
       {loading ? (
         <div className="grid gap-4">
           {[1, 2, 3].map((item) => (
-            <div key={item} className="h-32 animate-pulse rounded-[2rem] bg-white" />
+            <div key={item} className="section-shell h-32 animate-pulse rounded-[2rem]" />
           ))}
         </div>
       ) : filteredApplications.length > 0 ? (
@@ -125,75 +130,79 @@ export default function RecruiterCandidates({ user }: { user: User }) {
             return (
               <motion.div
                 key={application.id}
-                initial={{ opacity: 0, scale: 0.98 }}
+                initial={{ opacity: 0, scale: 0.985 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="flex flex-col gap-8 rounded-[2rem] border border-[#141414]/5 bg-white p-8 transition-all hover:border-blue-500/20 md:flex-row md:items-center md:justify-between"
+                className="list-row flex flex-col gap-6 p-6 md:flex-row md:items-center md:justify-between"
               >
-                <div className="flex items-center gap-6">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-50 to-blue-100 text-blue-600">
-                    <UserIcon size={28} />
+                <div className="flex items-center gap-4">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[rgba(70,102,255,0.1)] text-[var(--app-accent)]">
+                    <UserIcon size={24} aria-hidden="true" />
                   </div>
                   <div>
-                    <div className="mb-1 flex flex-wrap items-center gap-3">
-                      <h3 className="text-xl font-bold">
+                    <div className="mb-1 flex flex-wrap items-center gap-2">
+                      <h3 className="text-lg font-semibold">
                         {application.user?.profile?.name || application.user?.email}
                       </h3>
                       <span
-                        className={`rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase ${statusStyles[status] || statusStyles.PENDING}`}
+                        className={`rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] ${statusStyles[status] || statusStyles.PENDING}`}
                       >
                         {status}
                       </span>
                     </div>
-                    <p className="mb-3 text-sm font-medium text-[#141414]/60">
+                    <p className="text-sm text-[var(--app-text-muted)]">
                       {application.job.title} at {application.job.company}
                     </p>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="mt-2 flex flex-wrap gap-2">
                       {skills.length > 0 ? (
                         skills.map((skill: string) => (
                           <span
                             key={skill}
-                            className="rounded-md bg-[#F5F5F0] px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-[#141414]/40"
+                            className="status-chip rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em]"
                           >
                             {skill}
                           </span>
                         ))
                       ) : (
-                        <span className="text-xs text-[#141414]/40">
-                          No parsed skills yet. Ask the candidate to upload a resume.
+                        <span className="text-xs text-[var(--app-text-soft)]">
+                          No parsed skills yet.
                         </span>
                       )}
                     </div>
-                    <p className="mt-3 text-xs text-[#141414]/40">
+                    <p className="mono mt-3 text-[11px] text-[var(--app-text-soft)]">
                       Applied on {new Date(application.appliedAt).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3 md:justify-end">
+                <div className="flex flex-wrap items-center gap-2 md:justify-end">
                   <button
                     onClick={() => updateStatus(application.id, "SHORTLISTED")}
                     disabled={updatingId === application.id}
-                    className="flex items-center gap-2 rounded-2xl bg-green-50 px-5 py-3 text-sm font-bold text-green-700 transition-colors hover:bg-green-100 disabled:opacity-50"
+                    className="button-secondary rounded-xl px-4 py-2 text-sm font-semibold text-[var(--app-success)] disabled:opacity-50"
                   >
-                    <CheckCircle size={18} /> Shortlist
+                    <span className="inline-flex items-center gap-1.5">
+                      <CheckCircle size={16} aria-hidden="true" /> Shortlist
+                    </span>
                   </button>
                   <button
                     onClick={() => updateStatus(application.id, "REJECTED")}
                     disabled={updatingId === application.id}
-                    className="flex items-center gap-2 rounded-2xl bg-red-50 px-5 py-3 text-sm font-bold text-red-700 transition-colors hover:bg-red-100 disabled:opacity-50"
+                    className="button-secondary rounded-xl px-4 py-2 text-sm font-semibold text-[var(--app-danger)] disabled:opacity-50"
                   >
-                    <XCircle size={18} /> Reject
+                    <span className="inline-flex items-center gap-1.5">
+                      <XCircle size={16} aria-hidden="true" /> Reject
+                    </span>
                   </button>
                   <button
                     onClick={() => updateStatus(application.id, "PENDING")}
                     disabled={updatingId === application.id}
-                    className="rounded-2xl bg-[#F5F5F0] px-5 py-3 text-sm font-bold text-[#141414] transition-colors hover:bg-[#eaeade] disabled:opacity-50"
+                    className="button-secondary rounded-xl px-4 py-2 text-sm font-semibold disabled:opacity-50"
                   >
-                    Move to Pending
+                    Pending
                   </button>
                   <Link
                     to={`/profile/${application.userId}`}
-                    className="rounded-2xl bg-[#141414] px-6 py-4 text-sm font-bold text-[#F5F5F0] transition-opacity hover:opacity-90"
+                    className="button-primary rounded-xl px-5 py-2 text-sm font-semibold"
                   >
                     View Profile
                   </Link>
@@ -203,11 +212,9 @@ export default function RecruiterCandidates({ user }: { user: User }) {
           })}
         </div>
       ) : (
-        <div className="rounded-[2rem] border border-[#141414]/5 bg-white py-20 text-center">
-          <h3 className="mb-2 text-xl font-bold">No applicants yet</h3>
-          <p className="text-[#141414]/40">
-            Once candidates apply to your listings, they will appear here.
-          </p>
+        <div className="section-shell rounded-[2rem] py-20 text-center">
+          <h3 className="mb-2 text-xl font-semibold">No applicants yet</h3>
+          <p className="text-[var(--app-text-soft)]">Candidates will appear here once they apply to your listings.</p>
         </div>
       )}
     </div>
