@@ -31,7 +31,7 @@ export default function PublicProfile() {
 
     if (loading) {
         return (
-            <div className="app-shell flex min-h-screen items-center justify-center px-6">
+            <div className="flex min-h-[calc(100vh-92px)] items-center justify-center px-6">
                 <div className="section-shell rounded-[2rem] px-8 py-6 text-center">
                     <div className="eyebrow mb-2">Public Profile</div>
                     <div className="text-sm font-semibold text-[var(--app-text-muted)]">Accessing profile registry…</div>
@@ -41,7 +41,7 @@ export default function PublicProfile() {
     }
     if (error) {
         return (
-            <div className="app-shell flex min-h-screen items-center justify-center px-6">
+            <div className="flex min-h-[calc(100vh-92px)] items-center justify-center px-6">
                 <div className="section-shell max-w-xl rounded-[2rem] px-8 py-7 text-center">
                     <div className="eyebrow mb-2">Unable to Load</div>
                     <div className="text-base font-semibold">{error}</div>
@@ -72,7 +72,7 @@ export default function PublicProfile() {
     };
 
     return (
-        <div className="app-shell min-h-screen">
+        <div className="min-h-[calc(100vh-92px)]">
             {/* Split Header */}
             <div className="grid lg:grid-cols-2">
                 <div className="gradient-surface flex flex-col justify-center p-12 md:p-24">

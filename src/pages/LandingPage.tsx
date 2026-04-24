@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { Link } from "react-router-dom";
+import { LinkButton } from "../components/ui/Button";
 import {
   ArrowRight,
   CheckCircle2,
@@ -35,7 +35,7 @@ const pillars = [
 
 export default function LandingPage() {
   return (
-    <div className="app-shell">
+    <div className="min-h-[calc(100vh-92px)]">
       <section className="px-4 pb-12 pt-6 md:px-6 md:pb-18 md:pt-10">
         <div className="page-frame">
           <div className="page-hero grid gap-10 px-6 py-8 md:px-10 md:py-11 lg:grid-cols-[1.04fr_0.96fr] lg:px-14 lg:py-14">
@@ -55,12 +55,9 @@ export default function LandingPage() {
                 A luxury-light product surface for seekers and recruiters that brings profile strength, role fit, and decision analytics into one disciplined workflow.
               </p>
               <div className="mt-9 flex flex-wrap items-center gap-4">
-                <Link
-                  to="/auth"
-                  className="button-primary inline-flex items-center gap-2 rounded-full px-7 py-4 text-sm font-semibold"
-                >
+                <LinkButton to="/auth" variant="primary" size="lg">
                   Open ApplyIQ <ArrowRight size={18} />
-                </Link>
+                </LinkButton>
                 <a
                   href="#system"
                   className="button-secondary inline-flex items-center gap-2 rounded-full px-7 py-4 text-sm font-semibold"
@@ -70,16 +67,49 @@ export default function LandingPage() {
               </div>
             </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.62, delay: 0.1 }}
-              className="panel-surface-strong relative overflow-hidden rounded-[2.4rem] p-5 md:p-6"
-            >
-              <div className="absolute -left-8 top-0 h-44 w-44 rounded-full bg-[rgba(47,103,255,0.17)] blur-3xl" />
-              <div className="absolute -bottom-10 right-0 h-56 w-56 rounded-full bg-[rgba(76,185,214,0.16)] blur-3xl" />
-              <div className="relative z-10 space-y-4">
-                <div className="list-row p-5">
+	            <motion.div
+	              initial={{ opacity: 0, scale: 0.98 }}
+	              animate={{ opacity: 1, scale: 1 }}
+	              transition={{ duration: 0.62, delay: 0.1 }}
+	              className="panel-surface-strong relative overflow-hidden rounded-[2.4rem] p-5 md:p-6"
+	            >
+	              <div className="absolute -left-8 top-0 h-44 w-44 rounded-full bg-[rgba(47,103,255,0.17)] blur-3xl" />
+	              <div className="absolute -bottom-10 right-0 h-56 w-56 rounded-full bg-[rgba(76,185,214,0.16)] blur-3xl" />
+	              <svg
+	                className="pointer-events-none absolute inset-0 opacity-60"
+	                viewBox="0 0 600 600"
+	                fill="none"
+	                aria-hidden="true"
+	              >
+	                <path
+	                  d="M40 420C126 306 164 328 238 260C314 190 376 174 456 152C520 132 560 86 584 44"
+	                  className="motion-stroke"
+	                  stroke="url(#g1)"
+	                  strokeWidth="2"
+	                  strokeLinecap="round"
+	                />
+	                <path
+	                  d="M36 520C140 444 214 432 280 372C362 298 394 250 468 218C532 190 556 144 596 116"
+	                  className="motion-stroke motion-stroke-delayed"
+	                  stroke="url(#g2)"
+	                  strokeWidth="2"
+	                  strokeLinecap="round"
+	                />
+	                <defs>
+	                  <linearGradient id="g1" x1="40" y1="420" x2="584" y2="44" gradientUnits="userSpaceOnUse">
+	                    <stop stopColor="rgba(47,103,255,0.0)" />
+	                    <stop offset="0.35" stopColor="rgba(47,103,255,0.42)" />
+	                    <stop offset="1" stopColor="rgba(76,185,214,0.0)" />
+	                  </linearGradient>
+	                  <linearGradient id="g2" x1="36" y1="520" x2="596" y2="116" gradientUnits="userSpaceOnUse">
+	                    <stop stopColor="rgba(76,185,214,0.0)" />
+	                    <stop offset="0.4" stopColor="rgba(76,185,214,0.45)" />
+	                    <stop offset="1" stopColor="rgba(47,103,255,0.0)" />
+	                  </linearGradient>
+	                </defs>
+	              </svg>
+	              <div className="relative z-10 space-y-4">
+	                <div className="list-row p-5">
                   <div className="eyebrow mb-2">Live Match Workspace</div>
                   <div className="flex items-start justify-between gap-4">
                     <div>

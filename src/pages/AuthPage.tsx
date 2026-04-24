@@ -10,6 +10,7 @@ import {
   Sparkles,
   User as UserIcon,
 } from "lucide-react";
+import { Button } from "../components/ui/Button";
 
 interface AuthPageProps {
   onLogin: (user: User) => void;
@@ -57,7 +58,7 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
   };
 
   return (
-    <div className="app-shell min-h-[calc(100vh-92px)] px-4 py-6 md:px-6 md:py-8">
+    <div className="min-h-[calc(100vh-92px)] px-4 py-6 md:px-6 md:py-8">
       <div className="page-frame grid items-stretch gap-6 lg:grid-cols-[1.03fr_0.97fr]">
         <motion.section
           initial={{ opacity: 0, x: -18 }}
@@ -108,7 +109,7 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
 
           {!isLogin ? (
             <div className="panel-muted mb-8 grid grid-cols-2 gap-2 rounded-[1.5rem] p-1.5">
-              <button
+              <Button
                 type="button"
                 onClick={() => setRole("SEEKER")}
                 className={`flex items-center justify-center gap-2 rounded-[1rem] px-4 py-3 text-sm font-semibold ${
@@ -117,8 +118,8 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
               >
                 <UserIcon size={16} aria-hidden="true" />
                 Job Seeker
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={() => setRole("RECRUITER")}
                 className={`flex items-center justify-center gap-2 rounded-[1rem] px-4 py-3 text-sm font-semibold ${
@@ -127,7 +128,7 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
               >
                 <Briefcase size={16} aria-hidden="true" />
                 Recruiter
-              </button>
+              </Button>
             </div>
           ) : null}
 
@@ -182,9 +183,10 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
               </p>
             ) : null}
 
-            <button
+            <Button
               disabled={loading}
-              className="button-primary flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-sm font-semibold disabled:opacity-50"
+              variant="primary"
+              className="flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-sm font-semibold"
             >
               {loading ? (
                 <>
@@ -197,17 +199,18 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
                   <ArrowRight size={18} aria-hidden="true" />
                 </>
               )}
-            </button>
+            </Button>
           </form>
 
           <div className="mt-8 text-center text-sm">
-            <button
+            <Button
               type="button"
               onClick={() => setIsLogin((current) => !current)}
-              className="button-ghost rounded-full px-4 py-2 font-semibold"
+              variant="ghost"
+              size="sm"
             >
               {isLogin ? "Don’t have an account? Create one" : "Already have an account? Sign in"}
-            </button>
+            </Button>
           </div>
         </motion.section>
       </div>

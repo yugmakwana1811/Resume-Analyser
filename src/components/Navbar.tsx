@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { User } from "../App";
 import { ArrowRight, LayoutGrid, LogOut, Zap } from "lucide-react";
+import { Button, LinkButton } from "./ui/Button";
 
 interface NavbarProps {
   user: User;
@@ -31,20 +32,14 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
         </Link>
 
         <div className="hidden items-center gap-2 md:flex">
-          <Link
-            to="/"
-            className="button-ghost rounded-full px-4 py-2 text-sm font-semibold"
-          >
+          <LinkButton to="/" variant="ghost" size="sm">
             Home
-          </Link>
+          </LinkButton>
           {user && (
-            <Link
-              to="/dashboard"
-              className="button-ghost inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold"
-            >
+            <LinkButton to="/dashboard" variant="ghost" size="sm">
               <LayoutGrid size={16} aria-hidden="true" />
               Dashboard
-            </Link>
+            </LinkButton>
           )}
         </div>
 
@@ -54,22 +49,21 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
               <span className="status-chip hidden rounded-full px-3 py-1.5 text-xs sm:block">
                 {user.email}
               </span>
-              <button 
+              <Button
                 onClick={handleLogout}
-                className="button-secondary rounded-full p-2.5 text-[var(--app-text-muted)]"
+                variant="secondary"
+                size="icon"
+                className="text-[var(--app-text-muted)]"
                 title="Log Out"
                 aria-label="Log Out"
               >
                 <LogOut size={18} aria-hidden="true" />
-              </button>
+              </Button>
             </div>
           ) : (
-            <Link 
-              to="/auth" 
-              className="button-primary inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold"
-            >
+            <LinkButton to="/auth" variant="primary" size="sm" className="px-5 py-2.5">
               Get Started <ArrowRight size={16} aria-hidden="true" />
-            </Link>
+            </LinkButton>
           )}
         </div>
       </div>

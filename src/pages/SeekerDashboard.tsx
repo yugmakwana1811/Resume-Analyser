@@ -39,7 +39,7 @@ export default function SeekerDashboard({ user }: SeekerDashboardProps) {
   if (!user) return null;
 
   return (
-    <div className="app-shell min-h-[calc(100vh-92px)]">
+    <div className="min-h-[calc(100vh-92px)]">
       <div className="flex min-h-[calc(100vh-92px)]">
         <aside className="app-sidebar hidden w-[19rem] flex-col px-5 py-6 lg:flex">
           <div className="accent-surface rounded-[1.75rem] p-5">

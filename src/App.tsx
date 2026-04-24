@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { useState, useEffect, lazy, Suspense } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import AuthPage from "./pages/AuthPage";
 import SeekerDashboard from "./pages/SeekerDashboard";
@@ -13,6 +13,9 @@ import PublicProfile from "./pages/PublicProfile";
 import CompanyProfile from "./pages/CompanyProfile";
 import Navbar from "./components/Navbar";
 import { safeJsonParse } from "./lib/utils";
+import { AnimatePresence, motion } from "motion/react";
+
+const OrbitalBackground = lazy(() => import("./components/OrbitalBackground"));
 
 export type User = {
   id: string;
@@ -82,25 +85,51 @@ export default function App() {
   return (
     <Router>
       <div className="app-shell min-h-screen font-sans text-[var(--app-text)]">
+        <div className="orbital-layer" aria-hidden="true">
+          <Suspense fallback={null}>
+            <OrbitalBackground />
+          </Suspense>
+        </div>
         <Navbar user={user} onLogout={logout} />
-        <Routes>
+        <AnimatedRoutes user={user} onLogin={login} />
+      </div>
+    </Router>
+  );
+}
+
+function AnimatedRoutes({ user, onLogin }: { user: User; onLogin: (user: User) => void }) {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      <motion.div
+        key={location.pathname}
+        initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
+        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+        exit={{ opacity: 0, y: -8, filter: "blur(10px)" }}
+        transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}
+      >
+        <Routes location={location}>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/auth" element={<AuthPage onLogin={login} />} />
+          <Route path="/auth" element={<AuthPage onLogin={onLogin} />} />
           <Route path="/profile/:userId" element={<PublicProfile />} />
           <Route path="/company/:id" element={<CompanyProfile />} />
-          
-          <Route 
-            path="/dashboard/*" 
+          <Route
+            path="/dashboard/*"
             element={
               user ? (
-                user.role === "SEEKER" ? <SeekerDashboard user={user} /> : <RecruiterDashboard user={user} />
+                user.role === "SEEKER" ? (
+                  <SeekerDashboard user={user} />
+                ) : (
+                  <RecruiterDashboard user={user} />
+                )
               ) : (
                 <Navigate to="/auth" />
               )
-            } 
+            }
           />
         </Routes>
-      </div>
-    </Router>
+      </motion.div>
+    </AnimatePresence>
   );
 }

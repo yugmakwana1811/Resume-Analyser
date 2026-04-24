@@ -28,7 +28,7 @@ export default function CompanyProfile() {
 
   if (loading) {
     return (
-      <div className="app-shell flex min-h-screen items-center justify-center px-6">
+      <div className="flex min-h-[calc(100vh-92px)] items-center justify-center px-6">
         <div className="section-shell rounded-[2rem] px-8 py-6 text-center">
           <div className="eyebrow mb-2">Company Profile</div>
           <div className="text-sm font-semibold text-[var(--app-text-muted)]">Loading company details…</div>
@@ -38,7 +38,7 @@ export default function CompanyProfile() {
   }
   if (!company) {
     return (
-      <div className="app-shell flex min-h-screen items-center justify-center px-6">
+      <div className="flex min-h-[calc(100vh-92px)] items-center justify-center px-6">
         <div className="section-shell rounded-[2rem] px-8 py-6 text-center">
           <div className="eyebrow mb-2">Company Not Found</div>
           <div className="text-base font-semibold text-[var(--app-text-muted)]">No company record matched this link.</div>
@@ -48,7 +48,7 @@ export default function CompanyProfile() {
   }
 
   return (
-    <div className="app-shell min-h-screen pt-12 pb-20">
+    <div className="min-h-[calc(100vh-92px)] pt-12 pb-20">
       <div className="max-w-4xl mx-auto px-6">
         <Link to="/dashboard/jobs" className="mb-8 flex items-center gap-2 text-sm font-semibold text-[var(--app-text-muted)] transition-colors hover:text-[var(--app-text)]">
           <ArrowLeft size={16} /> Back to Jobs
