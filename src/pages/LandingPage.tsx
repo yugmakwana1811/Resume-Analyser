@@ -1,5 +1,10 @@
 import { motion } from "motion/react";
-import { LinkButton } from "../components/ui/Button";
+import { Button } from "@/components/ui/button";
+import { HeroScrollDemo } from "../components/HeroScrollDemo";
+import { HeroDemo } from "../components/HeroDemo";
+import { SparklesDemo } from "../components/SparklesDemo";
+import { GeometricHeroDemo } from "../components/GeometricHeroDemo";
+import { Link } from "react-router-dom";
 import {
   ArrowRight,
   CheckCircle2,
@@ -55,9 +60,11 @@ export default function LandingPage() {
                 A luxury-light product surface for seekers and recruiters that brings profile strength, role fit, and decision analytics into one disciplined workflow.
               </p>
               <div className="mt-9 flex flex-wrap items-center gap-4">
-                <LinkButton to="/auth" variant="primary" size="lg">
-                  Open ApplyIQ <ArrowRight size={18} />
-                </LinkButton>
+                <Button asChild variant="default" size="lg">
+                  <Link to="/auth">
+                    Open ApplyIQ <ArrowRight size={18} />
+                  </Link>
+                </Button>
                 <a
                   href="#system"
                   className="button-secondary inline-flex items-center gap-2 rounded-full px-7 py-4 text-sm font-semibold"
@@ -161,6 +168,34 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="px-4 py-10 md:px-6 md:py-14">
+        <div className="page-frame">
+          <div className="page-hero px-6 py-8 md:px-10 md:py-10">
+            <HeroDemo />
+          </div>
+        </div>
+      </section>
+
+      <section className="px-4 py-10 md:px-6 md:py-14">
+        <div className="page-frame">
+          <div className="section-shell rounded-[2.5rem]">
+            <HeroScrollDemo />
+          </div>
+        </div>
+      </section>
+
+      <section className="px-4 py-10 md:px-6 md:py-14">
+        <div className="page-frame">
+          <GeometricHeroDemo />
+        </div>
+      </section>
+
+      <section className="px-4 py-10 md:px-6 md:py-14">
+        <div className="page-frame">
+          <SparklesDemo />
         </div>
       </section>
 

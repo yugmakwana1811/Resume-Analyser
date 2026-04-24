@@ -10,7 +10,7 @@ import {
   Sparkles,
   User as UserIcon,
 } from "lucide-react";
-import { Button } from "../components/ui/Button";
+import { Button } from "@/components/ui/button";
 
 interface AuthPageProps {
   onLogin: (user: User) => void;
@@ -185,7 +185,7 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
 
             <Button
               disabled={loading}
-              variant="primary"
+              variant="default"
               className="flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-sm font-semibold"
             >
               {loading ? (

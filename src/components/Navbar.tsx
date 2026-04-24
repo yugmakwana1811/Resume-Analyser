@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { User } from "../App";
 import { ArrowRight, LayoutGrid, LogOut, Zap } from "lucide-react";
-import { Button, LinkButton } from "./ui/Button";
+import { Button } from "@/components/ui/button";
 
 interface NavbarProps {
   user: User;
@@ -32,14 +32,16 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
         </Link>
 
         <div className="hidden items-center gap-2 md:flex">
-          <LinkButton to="/" variant="ghost" size="sm">
-            Home
-          </LinkButton>
+          <Button asChild variant="ghost" size="sm">
+            <Link to="/">Home</Link>
+          </Button>
           {user && (
-            <LinkButton to="/dashboard" variant="ghost" size="sm">
+            <Button asChild variant="ghost" size="sm">
+              <Link to="/dashboard">
               <LayoutGrid size={16} aria-hidden="true" />
               Dashboard
-            </LinkButton>
+              </Link>
+            </Button>
           )}
         </div>
 
@@ -61,9 +63,11 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
               </Button>
             </div>
           ) : (
-            <LinkButton to="/auth" variant="primary" size="sm" className="px-5 py-2.5">
-              Get Started <ArrowRight size={16} aria-hidden="true" />
-            </LinkButton>
+            <Button asChild variant="default" size="sm" className="px-5 py-2.5">
+              <Link to="/auth">
+                Get Started <ArrowRight size={16} aria-hidden="true" />
+              </Link>
+            </Button>
           )}
         </div>
       </div>
