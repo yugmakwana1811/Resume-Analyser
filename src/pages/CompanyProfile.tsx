@@ -26,8 +26,26 @@ export default function CompanyProfile() {
     fetchCompany();
   }, [id]);
 
-  if (loading) return <div className="h-screen flex items-center justify-center font-sans">Loading company...</div>;
-  if (!company) return <div className="h-screen flex items-center justify-center font-sans text-xl">Company not found.</div>;
+  if (loading) {
+    return (
+      <div className="app-shell flex min-h-screen items-center justify-center px-6">
+        <div className="section-shell rounded-[2rem] px-8 py-6 text-center">
+          <div className="eyebrow mb-2">Company Profile</div>
+          <div className="text-sm font-semibold text-[var(--app-text-muted)]">Loading company details…</div>
+        </div>
+      </div>
+    );
+  }
+  if (!company) {
+    return (
+      <div className="app-shell flex min-h-screen items-center justify-center px-6">
+        <div className="section-shell rounded-[2rem] px-8 py-6 text-center">
+          <div className="eyebrow mb-2">Company Not Found</div>
+          <div className="text-base font-semibold text-[var(--app-text-muted)]">No company record matched this link.</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="app-shell min-h-screen pt-12 pb-20">

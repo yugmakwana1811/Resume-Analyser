@@ -25,7 +25,7 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
           <div className="min-w-0">
             <div className="font-sans text-lg font-semibold tracking-tight text-[var(--app-text)]">ApplyIQ</div>
             <div className="truncate text-[10px] font-semibold uppercase tracking-[0.24em] text-[var(--app-text-soft)]">
-              Career Intelligence Platform
+              Precision Hiring OS
             </div>
           </div>
         </Link>

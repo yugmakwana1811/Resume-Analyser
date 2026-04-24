@@ -41,7 +41,7 @@ export default function SeekerDashboard({ user }: SeekerDashboardProps) {
   return (
     <div className="app-shell min-h-[calc(100vh-92px)]">
       <div className="flex min-h-[calc(100vh-92px)]">
-        <aside className="app-sidebar hidden w-[18.5rem] flex-col px-5 py-6 lg:flex">
+        <aside className="app-sidebar hidden w-[19rem] flex-col px-5 py-6 lg:flex">
           <div className="accent-surface rounded-[1.75rem] p-5">
             <div className="mb-3 flex items-center gap-2">
               <div className="rounded-full bg-white/75 p-2 text-[var(--app-accent)]">
@@ -101,8 +101,8 @@ export default function SeekerDashboard({ user }: SeekerDashboardProps) {
       </div>
 
       <nav className="fixed inset-x-4 bottom-4 z-40 lg:hidden">
-        <div className="mobile-dock grid grid-cols-4 rounded-[1.75rem] p-2">
-          {seekerNav.slice(0, 4).map((item) => {
+        <div className="mobile-dock flex gap-2 overflow-x-auto rounded-[1.75rem] p-2 scrollbar-none">
+          {seekerNav.map((item) => {
             const active =
               item.to === "/dashboard"
                 ? location.pathname === "/dashboard" || location.pathname === "/dashboard/overview"
@@ -111,7 +111,7 @@ export default function SeekerDashboard({ user }: SeekerDashboardProps) {
               <Link
                 key={item.to}
                 to={item.to}
-                className={`flex flex-col items-center gap-1 rounded-[1rem] px-2 py-3 text-[11px] font-semibold ${
+                className={`flex min-w-[5.2rem] flex-col items-center gap-1 rounded-[1rem] px-2 py-3 text-[11px] font-semibold ${
                   active ? "nav-link-luxury-active" : "nav-link-luxury"
                 }`}
               >

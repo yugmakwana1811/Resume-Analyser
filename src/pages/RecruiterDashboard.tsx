@@ -23,7 +23,7 @@ export default function RecruiterDashboard({ user }: RecruiterDashboardProps) {
   return (
     <div className="app-shell min-h-[calc(100vh-92px)]">
       <div className="flex min-h-[calc(100vh-92px)]">
-        <aside className="app-sidebar hidden w-[18.5rem] flex-col px-5 py-6 lg:flex">
+        <aside className="app-sidebar hidden w-[19rem] flex-col px-5 py-6 lg:flex">
           <div className="accent-surface rounded-[1.75rem] p-5">
             <div className="mb-3 flex items-center gap-2">
               <div className="rounded-full bg-white/75 p-2 text-[var(--app-accent)]">

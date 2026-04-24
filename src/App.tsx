@@ -68,11 +68,20 @@ export default function App() {
     localStorage.removeItem("user");
   };
 
-  if (loading) return <div className="h-screen flex items-center justify-center font-sans">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="app-shell flex min-h-screen items-center justify-center px-6">
+        <div className="section-shell rounded-[2rem] px-8 py-6 text-center">
+          <div className="eyebrow mb-2">ApplyIQ</div>
+          <div className="text-sm font-semibold text-[var(--app-text-muted)]">Loading workspace…</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Router>
-      <div className="min-h-screen bg-[#F5F5F0] text-[#141414] font-sans">
+      <div className="app-shell min-h-screen font-sans text-[var(--app-text)]">
         <Navbar user={user} onLogout={logout} />
         <Routes>
           <Route path="/" element={<LandingPage />} />
